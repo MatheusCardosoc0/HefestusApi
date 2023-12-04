@@ -1,0 +1,125 @@
+﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.Models.Administracao;
+using HefestusApi.Utils;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace HefestusApi.Controllers.PESSOAL
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class personGroupController : ControllerBase
+    {
+        private readonly DataContext _context;
+
+        public personGroupController(DataContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PersonGroup>> GetPersonGroupId()
+        {
+            var personGroup = await _context.PersonGroup
+                .ToListAsync();
+
+            return Ok(personGroup);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PersonGroup>> GetPersonById(int id)
+        {
+            var personGroup = await _context.PersonGroup
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (personGroup == null)
+            {
+                return NotFound($"Pessoa com o ID {id} não existe");
+            }
+
+            return Ok(personGroup);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
+        {
+            var newGroup = new PersonGroup
+            {
+                Name = request.Name
+            };
+
+            _context.PersonGroup.Add(newGroup);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPersonGroupId), new { id = newGroup.Id }, newGroup);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<PersonGroup>> UpdatePersonGroup(int id, PersonGroupDto request)
+        {
+            var personGroup = await _context.PersonGroup.FindAsync(id);
+
+            if (personGroup == null)
+            {
+                return NotFound();
+            }
+
+            personGroup.Name = request.Name;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PersonGroupExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeletePersonGroup(int id)
+        {
+            var personGroup = await _context.PersonGroup
+                .Include(x => x.Persons)
+                .FirstOrDefaultAsync(personGroup => personGroup.Id == id);
+
+            if (personGroup == null)
+            {
+                return NotFound($"Pessoa com o ID {id} não existe");
+            }
+
+            if (personGroup.Persons.Any())
+            {
+                return BadRequest("Não é possível excluir o grupo de pessoas, pois existem pessoas associadas a ele.");
+            }
+
+            _context.PersonGroup.Remove(personGroup);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(500, "Internal server error while deleting the personGroup.");
+            }
+
+            return NoContent();
+        }
+
+        private bool PersonGroupExists(int id)
+        {
+            return _context.PersonGroup.Any(e => e.Id == id);
+        }
+
+
+    }
+}
