@@ -22,6 +22,7 @@ namespace HefestusApi.Models.Administracao
         public string? Habilities { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         public List<PersonGroup> PersonGroups { get; set; }
+        [JsonIgnore]
         public User User { get; set; }
     }
 }

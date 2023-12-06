@@ -1,8 +1,7 @@
 ﻿namespace HefestusApi.DTOs.Administracao
 {
     public record struct PersonRequiredData(
-        int Id,
-        string UrlImage
+        int Id
         );
     public record struct UserDto(
         string Name,

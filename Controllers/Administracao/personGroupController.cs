@@ -18,7 +18,7 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpGet]
-        public async Task<ActionResult<PersonGroup>> GetPersonGroupId()
+        public async Task<ActionResult<PersonGroup>> GetPersonGroups()
         {
             var personGroup = await _context.PersonGroup
                 .ToListAsync();
@@ -27,7 +27,7 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PersonGroup>> GetPersonById(int id)
+        public async Task<ActionResult<PersonGroup>> GetPersonGroupById(int id)
         {
             var personGroup = await _context.PersonGroup
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -43,15 +43,16 @@ namespace HefestusApi.Controllers.PESSOAL
         [HttpPost]
         public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
         {
-            var newGroup = new PersonGroup
+            var newPersonGroup = new PersonGroup
             {
                 Name = request.Name
             };
 
-            _context.PersonGroup.Add(newGroup);
+            _context.PersonGroup.Add(newPersonGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPersonGroupId), new { id = newGroup.Id }, newGroup);
+            return Ok(newPersonGroup);
+            //return CreatedAtAction(nameof(GetPersonGroupId), new { id = newGroup.Id }, newGroup);
         }
 
         [HttpPut("{id}")]

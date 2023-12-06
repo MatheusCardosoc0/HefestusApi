@@ -1,5 +1,5 @@
-﻿namespace HefestusApi.DTOs.Administracao;
-
+﻿namespace HefestusApi.DTOs.Administracao
+{
 public record struct PersonDto(
         string Name,
         string Email,
@@ -19,3 +19,4 @@ public record struct PersonDto(
         string Description,
         List<PersonGroupDto> PersonGroup
         );
+};

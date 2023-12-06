@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace HefestusApi.Models.Administracao
+﻿namespace HefestusApi.Models.Administracao
 {
     public class User
     {
@@ -8,7 +6,6 @@ namespace HefestusApi.Models.Administracao
         public string Name { get; set; }
         public string Password { get; set; }
         public int PersonId { get; set; }
-        [JsonIgnore]
         public Person Person { get; set; }
     }
 }

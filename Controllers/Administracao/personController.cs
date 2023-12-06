@@ -18,11 +18,10 @@ namespace EntityFramework7Relationships.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Person>> GetPersonById()
+        public async Task<ActionResult<Person>> GetPersons()
         {
             var person = await _context.Person
                 .Include(c => c.PersonGroups)
-                .Include(c => c.User)
                 .ToListAsync();
 
             return Ok(person);
@@ -145,6 +144,7 @@ namespace EntityFramework7Relationships.Controllers
                 person.PersonGroups = newGroupsList;
             }
 
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -161,16 +161,24 @@ namespace EntityFramework7Relationships.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(person);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePerson(int id)
         {
-            var person = await _context.Person.FindAsync(id);
+            var person = await _context.Person
+                .Include(p => p.User)
+                .FirstAsync(p => p.Id == id);
+
             if (person == null)
             {
                 return NotFound($"Pessoa com o ID {id} não existe");
+            }
+
+            if(person.User != null)
+            {
+                return NotFound($"Essa pessoa não pode ser deletada, pois está associada a um usuário");
             }
 
             _context.Person.Remove(person);
