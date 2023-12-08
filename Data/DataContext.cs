@@ -10,6 +10,7 @@ namespace HefestusApi.Utils
         public DbSet<Person> Person { get; set; }
         public DbSet<PersonGroup> PersonGroup { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<City> Cities { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

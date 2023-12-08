@@ -87,8 +87,13 @@ namespace HefestusApi.Controllers.Administracao
                 return NotFound($"User com o ID {id} não encontrado");
             }
 
+            if (!string.IsNullOrWhiteSpace(request.Password) && !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+            {
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                user.Password = hashedPassword;
+            }
+
             user.Name = request.Name;
-            user.Password = request.Password;
 
             if (request.Person.Id != 0)
             {

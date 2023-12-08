@@ -17,6 +17,7 @@ public record struct PersonDto(
         string MaritalStatus,
         string Habilities,
         string Description,
-        List<PersonGroupDto> PersonGroup
+        List<PersonGroupDto> PersonGroup,
+        CityDto city
         );
 };

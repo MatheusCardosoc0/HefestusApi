@@ -1,7 +1,10 @@
+using Api.Utilities;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 
 namespace HefestusApi
@@ -21,8 +24,8 @@ namespace HefestusApi
             {
                 token.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = "https://localhost:7221/",
-                    ValidAudience = "https://localhost:7221/",
+                    ValidIssuer = "https://localhost:7263/",
+                    ValidAudience = "https://localhost:7263/",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:key"]!)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -44,10 +47,14 @@ namespace HefestusApi
                 });
             });
 
+            builder.Services.AddScoped<TokenService>();
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
             var app = builder.Build();
 

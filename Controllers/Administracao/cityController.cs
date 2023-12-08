@@ -1,37 +1,36 @@
 ﻿using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace HefestusApi.Controllers.PESSOAL
+namespace HefestusApi.Controllers.Administracao
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class personGroupController : ControllerBase
+    public class cityController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public personGroupController(DataContext context)
+        public cityController(DataContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult<PersonGroup>> GetPersonGroups()
+        public async Task<ActionResult<City>> GetCitys()
         {
-            var personGroup = await _context.PersonGroup
+            var personGroup = await _context.Cities
                 .ToListAsync();
 
             return Ok(personGroup);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PersonGroup>> GetPersonGroupById(int id)
+        public async Task<ActionResult<City>> GetCityById(int id)
         {
-            var personGroup = await _context.PersonGroup
+            var personGroup = await _context.Cities
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (personGroup == null)
@@ -43,24 +42,23 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpPost]
-        public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
+        public async Task<ActionResult<City>> CreateCity(CityDto request)
         {
-            var newPersonGroup = new PersonGroup
+            var newCity = new City
             {
                 Name = request.Name
             };
 
-            _context.PersonGroup.Add(newPersonGroup);
+            _context.Cities.Add(newCity);
             await _context.SaveChangesAsync();
 
-            return Ok(newPersonGroup);
-            //return CreatedAtAction(nameof(GetPersonGroupId), new { id = newGroup.Id }, newGroup);
+            return Ok(newCity);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PersonGroup>> UpdatePersonGroup(int id, PersonGroupDto request)
+        public async Task<ActionResult<City>> UpdateCity(int id, CityDto request)
         {
-            var personGroup = await _context.PersonGroup.FindAsync(id);
+            var personGroup = await _context.Cities.FindAsync(id);
 
             if (personGroup == null)
             {
@@ -75,7 +73,7 @@ namespace HefestusApi.Controllers.PESSOAL
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PersonGroupExists(id))
+                if (!CityExists(id))
                 {
                     return NotFound();
                 }
@@ -89,9 +87,9 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePersonGroup(int id)
+        public async Task<ActionResult> DeleteCity(int id)
         {
-            var personGroup = await _context.PersonGroup
+            var personGroup = await _context.Cities
                 .Include(x => x.Persons)
                 .FirstOrDefaultAsync(personGroup => personGroup.Id == id);
 
@@ -102,27 +100,24 @@ namespace HefestusApi.Controllers.PESSOAL
 
             if (personGroup.Persons.Any())
             {
-                return BadRequest("Não é possível excluir o grupo de pessoas, pois existem pessoas associadas a ele.");
+                return BadRequest("Não é possível excluir a cidade, pois existem pessoas associadas a ele.");
             }
 
-            _context.PersonGroup.Remove(personGroup);
+            _context.Cities.Remove(personGroup);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                return StatusCode(500, "Internal server error while deleting the personGroup.");
+                return StatusCode(500, "Internal server error while deleting the city.");
             }
-
             return NoContent();
         }
 
-        private bool PersonGroupExists(int id)
+        private bool CityExists(int id)
         {
-            return _context.PersonGroup.Any(e => e.Id == id);
+            return _context.Cities.Any(e => e.Id == id);
         }
-
-
     }
 }

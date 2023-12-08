@@ -1,6 +1,7 @@
 ﻿using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Others
 {
@@ -24,17 +25,22 @@ namespace HefestusApi.Controllers.Others
         }
 
         [HttpPost]
-        public ActionResult SignIn(RequiredCampsForAuthentication userCredentials)
+        public async Task<ActionResult> SignIn(RequiredCampsForAuthentication userCredentials)
         {
-            var user = _context.Users
-                .FirstOrDefault(u => u.Name == userCredentials.Username && u.Password == userCredentials.Password);
+            var user = await _context.Users
+                .Include(x => x.Person)
+                .FirstOrDefaultAsync(u => u.Name == userCredentials.Username);
 
             if (user == null)
-                return Unauthorized();
+                return NotFound("uai");
+
+            bool validPassword = BCrypt.Net.BCrypt.Verify(userCredentials.Password, user.Password);
+            if (!validPassword)
+                return NotFound("ue");
 
             var token = _tokenGenerator.GenerateToken(user);
 
-            return Ok(new { token });
+            return Ok(token);
         }
 
         [HttpGet("{token}")]
