@@ -22,6 +22,7 @@ namespace EntityFramework7Relationships.Controllers
         {
             var person = await _context.Person
                 .Include(c => c.PersonGroups)
+                .Include(c => c.City)
                 .ToListAsync();
 
             return Ok(person);
@@ -32,6 +33,7 @@ namespace EntityFramework7Relationships.Controllers
         {
             var person = await _context.Person
                 .Include(c => c.PersonGroups)
+                .Include(c => c.City)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (person == null)
@@ -43,8 +45,15 @@ namespace EntityFramework7Relationships.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Person>>> CreatePerson(PersonDto request)
+        public async Task<ActionResult<Person>> CreatePerson(PersonDto request)
         {
+            var existCity = await _context.Cities.FirstOrDefaultAsync(c => c.Id == request.CityId);
+
+            if(existCity == null)
+            {
+                return NotFound($"A cidade com o id {request.CityId} mão existe");
+            }
+
             var newPerson = new Person
             {
                 Name = request.Name,
@@ -63,7 +72,9 @@ namespace EntityFramework7Relationships.Controllers
                 MaritalStatus = request.MaritalStatus,
                 Habilities = request.Habilities,
                 Description = request.Description,
-                PersonGroups = new List<PersonGroup>()
+                CityId = request.CityId,
+                PersonGroups = new List<PersonGroup>(),
+                City = existCity,
             };
 
             if (request.PersonGroup != null)

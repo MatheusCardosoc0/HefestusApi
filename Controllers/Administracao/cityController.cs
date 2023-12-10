@@ -46,7 +46,9 @@ namespace HefestusApi.Controllers.Administracao
         {
             var newCity = new City
             {
-                Name = request.Name
+                Name = request.Name,
+                IBGENumber = request.IBGENumber,
+                State = request.State
             };
 
             _context.Cities.Add(newCity);

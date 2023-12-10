@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231208004729_AddCity")]
-    partial class AddCity
+    [Migration("20231210232120_AddProductRelations")]
+    partial class AddProductRelations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,9 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -116,12 +119,9 @@ namespace HefestusApi.Migrations
                     b.Property<string>("UrlImage")
                         .HasColumnType("text");
 
-                    b.Property<int>("cityId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("cityId");
+                    b.HasIndex("CityId");
 
                     b.ToTable("Person");
                 });
@@ -170,6 +170,99 @@ namespace HefestusApi.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("HefestusApi.Models.Produtos.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FamilyId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PriceSale")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PriceTotal")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubgroupId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("SubgroupId");
+
+                    b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Produtos.ProductFamily", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductFamily");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Produtos.ProductGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductGroups");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Produtos.ProductSubGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductSubGroup");
+                });
+
             modelBuilder.Entity("PersonPersonGroup", b =>
                 {
                     b.Property<int>("PersonGroupsId")
@@ -187,13 +280,13 @@ namespace HefestusApi.Migrations
 
             modelBuilder.Entity("HefestusApi.Models.Administracao.Person", b =>
                 {
-                    b.HasOne("HefestusApi.Models.Administracao.City", "city")
+                    b.HasOne("HefestusApi.Models.Administracao.City", "City")
                         .WithMany("Persons")
-                        .HasForeignKey("cityId")
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("city");
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
@@ -205,6 +298,33 @@ namespace HefestusApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Produtos.Product", b =>
+                {
+                    b.HasOne("HefestusApi.Models.Produtos.ProductFamily", "Family")
+                        .WithMany()
+                        .HasForeignKey("FamilyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HefestusApi.Models.Produtos.ProductGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HefestusApi.Models.Produtos.ProductSubGroup", "Subgroup")
+                        .WithMany()
+                        .HasForeignKey("SubgroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Family");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Subgroup");
                 });
 
             modelBuilder.Entity("PersonPersonGroup", b =>
