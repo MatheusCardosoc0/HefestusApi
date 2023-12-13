@@ -132,10 +132,10 @@ namespace EntityFramework7Relationships.Controllers
             person.Habilities = request.Habilities;
             person.Description = request.Description;
 
+            person.PersonGroups.Clear();
+
             if (request.PersonGroup != null)
             {
-                var newGroupsList = new List<PersonGroup>();
-
                 foreach (var groupDto in request.PersonGroup)
                 {
                     var existingGroup = await _context.PersonGroup
@@ -143,16 +143,14 @@ namespace EntityFramework7Relationships.Controllers
 
                     if (existingGroup != null)
                     {
-                        newGroupsList.Add(existingGroup);
+                        person.PersonGroups.Add(existingGroup);
                     }
                     else
                     {
                         var newGroup = new PersonGroup { Name = groupDto.Name };
-                        newGroupsList.Add(newGroup);
+                        person.PersonGroups.Add(newGroup);
                     }
                 }
-
-                person.PersonGroups = newGroupsList;
             }
 
 
