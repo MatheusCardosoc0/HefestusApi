@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using HefestusApi.Models.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace HefestusApi.Models.Administracao
 {
-    public class City
+    public class City : TimeTrail 
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -18,6 +18,7 @@ public record struct PersonDto(
         string Habilities,
         string Description,
         List<PersonGroupDto> PersonGroup,
-        int CityId
+        int CityId,
+        CityDto City
         );
 };

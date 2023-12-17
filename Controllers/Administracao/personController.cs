@@ -1,5 +1,6 @@
 ﻿using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,14 +48,20 @@ namespace EntityFramework7Relationships.Controllers
         [HttpPost]
         public async Task<ActionResult<Person>> CreatePerson(PersonDto request)
         {
-            var existCity = await _context.Cities.FirstOrDefaultAsync(c => c.Id == request.CityId);
-
-            if(existCity == null)
+            if(request == null)
             {
-                return NotFound($"A cidade com o id {request.CityId} mão existe");
+                return BadRequest("Dados do pedido inválidos ou incompletos.");
+            }
+            if(request.PersonGroup == null) 
+            {
+                return BadRequest("Grupo deve ser informada.");
+            }
+            if (request.City == null)
+            {
+                return BadRequest("Cidade deve ser informada.");
             }
 
-            var newPerson = new Person
+                var newPerson = new Person
             {
                 Name = request.Name,
                 Email = request.Email,
@@ -72,13 +79,10 @@ namespace EntityFramework7Relationships.Controllers
                 MaritalStatus = request.MaritalStatus,
                 Habilities = request.Habilities,
                 Description = request.Description,
-                CityId = request.CityId,
-                PersonGroups = new List<PersonGroup>(),
-                City = existCity,
-            };
+                PersonGroups = new List<PersonGroup>()
+                };
 
-            if (request.PersonGroup != null)
-            {
+           
                 foreach (var groupDto in request.PersonGroup)
                 {
                     var existingGroup = await _context.PersonGroup
@@ -94,7 +98,27 @@ namespace EntityFramework7Relationships.Controllers
                         newPerson.PersonGroups.Add(newGroup);
                     }
                 }
-            }
+
+
+            
+                var existingCity = await _context.Cities
+                    .FirstOrDefaultAsync(pg => pg.IBGENumber == request.City.IBGENumber);
+
+                if (existingCity != null)
+                {
+                    newPerson.City = existingCity;
+                    newPerson.CityId = existingCity.Id;
+                }
+                else
+                {
+                    var newCity = new City { Name = request.City.Name, IBGENumber = request.City.IBGENumber, State = request.City.State };
+                    _context.Cities.Add(newCity);
+                    await _context.SaveChangesAsync();
+                    newPerson.City = newCity;
+                    newPerson.CityId = newCity.Id;
+                }
+            
+            
 
             _context.Person.Add(newPerson);
             await _context.SaveChangesAsync();
@@ -151,6 +175,34 @@ namespace EntityFramework7Relationships.Controllers
                         person.PersonGroups.Add(newGroup);
                     }
                 }
+            }
+            else
+            {
+                return BadRequest("Grupo deve ser informada.");
+            }
+
+            if (request.City != null)
+            {
+                var existingCity = await _context.Cities
+                    .FirstOrDefaultAsync(pg => pg.IBGENumber == request.City.IBGENumber);
+
+                if (existingCity != null)
+                {
+                    person.City = existingCity;
+                    person.CityId = existingCity.Id;
+                }
+                else
+                {
+                    var newCity = new City { Name = request.City.Name, IBGENumber = request.City.IBGENumber, State = request.City.State };
+                    _context.Cities.Add(newCity);
+                    await _context.SaveChangesAsync();
+                    person.City = newCity;
+                    person.CityId = newCity.Id;
+                }
+            }
+            else
+            {
+                return BadRequest("Cidade deve ser informada.");
             }
 
 

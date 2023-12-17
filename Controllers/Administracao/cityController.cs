@@ -19,26 +19,26 @@ namespace HefestusApi.Controllers.Administracao
         }
 
         [HttpGet]
-        public async Task<ActionResult<City>> GetCitys()
+        public async Task<ActionResult<CityDto>> GetCitys()
         {
-            var personGroup = await _context.Cities
+            var city = await _context.Cities
                 .ToListAsync();
 
-            return Ok(personGroup);
+            return Ok(city);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<City>> GetCityById(int id)
         {
-            var personGroup = await _context.Cities
+            var city = await _context.Cities
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (personGroup == null)
+            if (city == null)
             {
                 return NotFound($"Pessoa com o ID {id} não existe");
             }
 
-            return Ok(personGroup);
+            return Ok(city);
         }
 
         [HttpPost]
@@ -60,14 +60,14 @@ namespace HefestusApi.Controllers.Administracao
         [HttpPut("{id}")]
         public async Task<ActionResult<City>> UpdateCity(int id, CityDto request)
         {
-            var personGroup = await _context.Cities.FindAsync(id);
+            var city = await _context.Cities.FindAsync(id);
 
-            if (personGroup == null)
+            if (city == null)
             {
                 return NotFound();
             }
 
-            personGroup.Name = request.Name;
+            city.Name = request.Name;
 
             try
             {
@@ -91,21 +91,21 @@ namespace HefestusApi.Controllers.Administracao
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCity(int id)
         {
-            var personGroup = await _context.Cities
+            var city = await _context.Cities
                 .Include(x => x.Persons)
-                .FirstOrDefaultAsync(personGroup => personGroup.Id == id);
+                .FirstOrDefaultAsync(city => city.Id == id);
 
-            if (personGroup == null)
+            if (city == null)
             {
-                return NotFound($"Pessoa com o ID {id} não existe");
+                return NotFound($"Cidade com o ID {id} não existe");
             }
 
-            if (personGroup.Persons.Any())
+            if (city.Persons.Any())
             {
                 return BadRequest("Não é possível excluir a cidade, pois existem pessoas associadas a ele.");
             }
 
-            _context.Cities.Remove(personGroup);
+            _context.Cities.Remove(city);
             try
             {
                 await _context.SaveChangesAsync();

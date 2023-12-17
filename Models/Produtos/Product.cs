@@ -1,4 +1,6 @@
-﻿namespace HefestusApi.Models.Produtos
+﻿using System.Text.Json.Serialization;
+
+namespace HefestusApi.Models.Produtos
 {
     public class Product
     {
@@ -15,5 +17,8 @@
         public ProductFamily Family { get; set; }
         public ProductGroup Group { get; set; }
         public ProductSubGroup Subgroup { get; set; }
+
+        [JsonIgnore]
+        public List<OrderProduct> OrderProducts { get; set; }
     }
 }

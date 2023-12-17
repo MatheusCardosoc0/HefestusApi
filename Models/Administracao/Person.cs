@@ -1,8 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using HefestusApi.Models.Interfaces;
+using HefestusApi.Models.Vendas;
+using System.Text.Json.Serialization;
 
 namespace HefestusApi.Models.Administracao
 {
-    public class Person
+    public class Person : TimeTrail
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -27,5 +29,7 @@ namespace HefestusApi.Models.Administracao
         public List<PersonGroup> PersonGroups { get; set; }
         [JsonIgnore]
         public User User { get; set; }
+        [JsonIgnore]
+        public List<Order> Orders { get; set; }
     }
 }

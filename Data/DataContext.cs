@@ -1,5 +1,7 @@
 ﻿using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Financeiro;
 using HefestusApi.Models.Produtos;
+using HefestusApi.Models.Vendas;
 using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Utils
@@ -16,6 +18,12 @@ namespace HefestusApi.Utils
         public DbSet<ProductGroup> ProductGroups { get; set; }
         public DbSet<ProductFamily> ProductFamily { get; set; } 
         public DbSet<ProductSubGroup> ProductSubGroup { get; set; }
+
+        public DbSet<PaymentOptions> PaymentOptions { get; set; }
+        public DbSet<PaymentCondition> PaymentCondition { get; set; }
+
+        public DbSet<Order> Order { get; set; }
+        public DbSet<OrderProduct> OrderProduct { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +52,31 @@ namespace HefestusApi.Utils
                 .HasOne(p => p.Subgroup)
                 .WithMany() 
                 .HasForeignKey(p => p.SubgroupId);
+
+            modelBuilder.Entity<OrderProduct>()
+                .HasKey(op => new { op.OrderId, op.ProductId });
+
+            modelBuilder.Entity<OrderProduct>()
+                .HasOne(op => op.Order)
+                .WithMany(o => o.OrderProducts)
+                .HasForeignKey(op => op.OrderId);
+
+            modelBuilder.Entity<OrderProduct>()
+                .HasOne(op => op.Product)
+                .WithMany(c => c.OrderProducts)
+                .HasForeignKey(op => op.ProductId);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Client)
+                .WithMany(p => p.Orders) 
+                .HasForeignKey(o => o.ClientId)
+                .OnDelete(DeleteBehavior.Restrict); 
+  
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Responsible)
+                .WithMany() 
+                .HasForeignKey(o => o.ResponsibleId)
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

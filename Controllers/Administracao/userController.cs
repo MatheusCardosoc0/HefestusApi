@@ -1,4 +1,5 @@
-﻿using HefestusApi.DTOs.Administracao;
+﻿using AutoMapper;
+using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -11,25 +12,24 @@ namespace HefestusApi.Controllers.Administracao
     public class userController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public userController(DataContext context)
+        public userController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserViewDto>>> GetUsers()
         {
-            var users = await _context.Users
-                .Include(u => u.Person)
-                //.ThenInclude(u => u.PersonGroups)
-                .ToListAsync();
-
-            return Ok(users);
+            var users = await _context.Users.Include(u => u.Person).ToListAsync();
+            var userDtos = _mapper.Map<IEnumerable<UserViewDto>>(users);
+            return Ok(userDtos);
         }
 
         [HttpGet("id")]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        public async Task<ActionResult<UserViewDto>> GetUserById(int id)
         {
             var user = await _context.Users
                 .Include(u => u.Person)
@@ -40,13 +40,15 @@ namespace HefestusApi.Controllers.Administracao
                 return NotFound($"Usuário com o id {id} não existe");
             }
 
-            return Ok(user);
+            var userDto = _mapper.Map<UserViewDto>(user);
+            return Ok(userDto);
         }
 
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(UserDto request)
         {
             var existingPerson = await _context.Person.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == request.Person.Id);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
 
             if (existingPerson == null)
             {
@@ -56,6 +58,11 @@ namespace HefestusApi.Controllers.Administracao
             if (existingPerson.User != null)
             {
                 return BadRequest($"Person com ID {request.Person.Id} já tem um User associado.");
+            }
+
+            if(existingUser != null)
+            {
+                return BadRequest($"Já existe um usuário com esse nome");
             }
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -72,7 +79,7 @@ namespace HefestusApi.Controllers.Administracao
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            return Ok(newUser);
+            return NoContent();
         }
 
         [HttpPut("{id}")]
@@ -80,7 +87,7 @@ namespace HefestusApi.Controllers.Administracao
         {
             var user = await _context.Users
                 .Include(u => u.Person)
-                .FirstOrDefaultAsync(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id && u.Name == request.Name);
 
             if (user == null)
             {
@@ -93,26 +100,34 @@ namespace HefestusApi.Controllers.Administracao
                 user.Password = hashedPassword;
             }
 
-            user.Name = request.Name;
+            //user.Name = user.Name;
 
             if (request.Person.Id != 0)
             {
-                var person = await _context.Person.FindAsync(request.Person.Id);
+                var person = await _context.Person
+                    .Include(p => p.User)
+                    .FirstOrDefaultAsync(p => p.Id == request.Person.Id);
+                    
+                   
                 if (person == null)
                 {
                     return NotFound($"Person com o ID {request.Person.Id} não encontrado");
+                }
+                if(person.User.Id != user.Id)
+                {
+                    return BadRequest($"Pessoa com o id {request.Person.Id} já possui outro usuário relacionado");
                 }
 
                 user.Person = person;
             }
             else
             {
-                user.Person = null;
+                return BadRequest("Deve ser associado uma pessoa ao usuário");
             }
 
             await _context.SaveChangesAsync();
 
-            return Ok(user);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

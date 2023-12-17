@@ -1,4 +1,5 @@
-﻿using HefestusApi.Models.Produtos;
+﻿using HefestusApi.DTOs.Produtos;
+using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,30 @@ namespace HefestusApi.Controllers.Produtos
             var productGroups = await _context.ProductGroups.ToListAsync();
 
             return Ok(productGroups);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductGroup>> ChangeProductGroups(int id, ProductGroupDto request )
+        {
+            var productGroups = await _context.ProductGroups.FindAsync(id);
+
+            if(productGroups == null)
+            {
+                return BadRequest($"Grupo de produtos com o id {id} não existe");
+            }
+
+            productGroups.Name = request.Name;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return BadRequest($"Grupo de produtos com o id {id} não pode ser alterado");
+            }
+
+            return NoContent();
         }
     }
 }

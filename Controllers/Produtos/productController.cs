@@ -81,6 +81,9 @@ namespace HefestusApi.Controllers.Produtos
                     newProduct.Group = newGroup;
                     newProduct.GroupId = newGroup.Id;
                 }
+            }else
+            {
+                return BadRequest("É necessário informar um grupo");
             }
 
             if (request.Family != null)
@@ -102,6 +105,10 @@ namespace HefestusApi.Controllers.Produtos
                     newProduct.FamilyId = newFamily.Id;
                 }
             }
+            else
+            {
+                return BadRequest("É necessário informar uma familia");
+            }
 
             if (request.Subgroup != null)
             {
@@ -121,6 +128,10 @@ namespace HefestusApi.Controllers.Produtos
                     newProduct.Subgroup = newSubgroup;
                     newProduct.SubgroupId = newSubgroup.Id;
                 }
+            }
+            else
+            {
+                return BadRequest("É necessário informar um subgrupo");
             }
 
             _context.Product.Add(newProduct);
@@ -167,6 +178,10 @@ namespace HefestusApi.Controllers.Produtos
                     product.GroupId = newGroup.Id;
                 }
             }
+            else
+            {
+                return BadRequest("É necessário informar um grupo");
+            }
 
             if (request.Family != null)
             {
@@ -187,6 +202,10 @@ namespace HefestusApi.Controllers.Produtos
                     product.FamilyId = newFamily.Id;
                 }
             }
+            else
+            {
+                return BadRequest("É necessário informar uma familia");
+            }
 
             if (request.Subgroup != null)
             {
@@ -206,6 +225,10 @@ namespace HefestusApi.Controllers.Produtos
                     product.Subgroup = newSubgroup;
                     product.SubgroupId = newSubgroup.Id;
                 }
+            }
+            else
+            {
+                return BadRequest("É necessário informar um subgrupo");
             }
 
             await _context.SaveChangesAsync();

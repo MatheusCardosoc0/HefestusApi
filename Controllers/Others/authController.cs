@@ -32,11 +32,11 @@ namespace HefestusApi.Controllers.Others
                 .FirstOrDefaultAsync(u => u.Name == userCredentials.Username);
 
             if (user == null)
-                return NotFound("uai");
+                return BadRequest("Usuário não encontrado");
 
             bool validPassword = BCrypt.Net.BCrypt.Verify(userCredentials.Password, user.Password);
             if (!validPassword)
-                return NotFound("ue");
+                return BadRequest("Senha incorreta");
 
             var token = _tokenGenerator.GenerateToken(user);
 

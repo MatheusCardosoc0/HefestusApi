@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.PESSOAL
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class personGroupController : ControllerBase
@@ -68,6 +67,7 @@ namespace HefestusApi.Controllers.PESSOAL
             }
 
             personGroup.Name = request.Name;
+            personGroup.LastModifiedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             try
             {
@@ -122,7 +122,5 @@ namespace HefestusApi.Controllers.PESSOAL
         {
             return _context.PersonGroup.Any(e => e.Id == id);
         }
-
-
     }
 }

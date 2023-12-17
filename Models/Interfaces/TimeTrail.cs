@@ -1,14 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HefestusApi.Models.Administracao
+namespace HefestusApi.Models.Interfaces
 {
-    public class PersonGroup
+    public class TimeTrail
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         [JsonIgnore]
-        public List<Person> Persons { get; set; }
         public string CreatedAt { get; private set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        [JsonIgnore]
         public string LastModifiedAt { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
     }
 }

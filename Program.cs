@@ -1,4 +1,5 @@
 using Api.Utilities;
+using HefestusApi.Data;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace HefestusApi
 {
@@ -47,6 +49,12 @@ namespace HefestusApi
                 });
             });
 
+            //builder.Services.AddControllers().AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            //});
+
+
             builder.Services.AddScoped<TokenService>();
 
             builder.Services.AddControllers();
@@ -55,6 +63,8 @@ namespace HefestusApi
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+            builder.Services.AddAutoMapper(typeof(Program));
 
             var app = builder.Build();
 

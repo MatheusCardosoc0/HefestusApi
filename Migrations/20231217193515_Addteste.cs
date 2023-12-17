@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProductRelations : Migration
+    public partial class Addteste : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,11 +19,42 @@ namespace HefestusApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     IBGENumber = table.Column<string>(type: "text", nullable: false),
-                    State = table.Column<string>(type: "text", nullable: false)
+                    State = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentCondition",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Installments = table.Column<int>(type: "integer", nullable: false),
+                    Interval = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentCondition", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentOptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    isUseCreditLimit = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentOptions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,7 +63,9 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,7 +133,9 @@ namespace HefestusApi.Migrations
                     MaritalStatus = table.Column<string>(type: "text", nullable: true),
                     Habilities = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    CityId = table.Column<int>(type: "integer", nullable: false)
+                    CityId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,6 +186,47 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Order",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ClientId = table.Column<int>(type: "integer", nullable: false),
+                    ResponsibleId = table.Column<int>(type: "integer", nullable: false),
+                    PaymentConditionId = table.Column<int>(type: "integer", nullable: false),
+                    PaymentOptionId = table.Column<int>(type: "integer", nullable: false),
+                    Value = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Order_PaymentCondition_PaymentConditionId",
+                        column: x => x.PaymentConditionId,
+                        principalTable: "PaymentCondition",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Order_PaymentOptions_PaymentOptionId",
+                        column: x => x.PaymentOptionId,
+                        principalTable: "PaymentOptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Order_Person_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Person",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Order_Person_ResponsibleId",
+                        column: x => x.ResponsibleId,
+                        principalTable: "Person",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PersonPersonGroup",
                 columns: table => new
                 {
@@ -195,6 +271,56 @@ namespace HefestusApi.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "OrderProduct",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderProduct", x => new { x.OrderId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_OrderProduct_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderProduct_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_ClientId",
+                table: "Order",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_PaymentConditionId",
+                table: "Order",
+                column: "PaymentConditionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_PaymentOptionId",
+                table: "Order",
+                column: "PaymentOptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_ResponsibleId",
+                table: "Order",
+                column: "ResponsibleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderProduct_ProductId",
+                table: "OrderProduct",
+                column: "ProductId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Person_CityId",
                 table: "Person",
@@ -231,16 +357,31 @@ namespace HefestusApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "PersonPersonGroup");
+                name: "OrderProduct");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "PersonPersonGroup");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
+                name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "Product");
+
+            migrationBuilder.DropTable(
                 name: "PersonGroup");
+
+            migrationBuilder.DropTable(
+                name: "PaymentCondition");
+
+            migrationBuilder.DropTable(
+                name: "PaymentOptions");
+
+            migrationBuilder.DropTable(
+                name: "Person");
 
             migrationBuilder.DropTable(
                 name: "ProductFamily");
@@ -250,9 +391,6 @@ namespace HefestusApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductSubGroup");
-
-            migrationBuilder.DropTable(
-                name: "Person");
 
             migrationBuilder.DropTable(
                 name: "Cities");
