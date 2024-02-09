@@ -25,7 +25,15 @@ namespace HefestusApi.Controllers.Others
                     }
 
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    var cities = JsonConvert.DeserializeObject<List<CityData>>(responseBody);
+                    var rawCities = JsonConvert.DeserializeObject<List<CityData>>(responseBody);
+
+                    var cities = rawCities.Select(city => new
+                    {
+                        Id = city.Id,
+                        IbgeNumber = city.Id,
+                        Name = city.Name,
+                        State = city.microrregiao.mesorregiao.UF.sigla
+                    }).ToList();
 
                     return Ok(cities);
                 }
@@ -38,12 +46,28 @@ namespace HefestusApi.Controllers.Others
         }
     }
 
+    public class UF
+    {
+        public string sigla { get; set; }
+    }
+
+    public class Mesorregiao
+    {
+        public UF UF { get; set; }
+    }
+
+    public class Microrregiao
+    {
+        public Mesorregiao mesorregiao { get; set; }
+    }
+
     public class CityData
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty("nome")]
         public string Name { get; set; }
+        public Microrregiao microrregiao { get; set; }
     }
 
 }

@@ -64,10 +64,12 @@ namespace HefestusApi.Controllers.Administracao
 
             if (city == null)
             {
-                return NotFound();
+                return NotFound($"Cidade com este id não encontrada");
             }
 
             city.Name = request.Name;
+            city.State = request.State;
+            city.IBGENumber = request.IBGENumber;
 
             try
             {

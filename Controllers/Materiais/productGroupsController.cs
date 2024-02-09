@@ -1,4 +1,6 @@
-﻿using HefestusApi.DTOs.Produtos;
+﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.DTOs.Produtos;
+using HefestusApi.Models.Administracao;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +26,28 @@ namespace HefestusApi.Controllers.Produtos
             var productGroups = await _context.ProductGroups.ToListAsync();
 
             return Ok(productGroups);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<PersonGroup>> CreateProductGroup(ProductGroupDto request)
+        {
+            var existingProductGroup = await _context.ProductGroups.FirstOrDefaultAsync(p => p.Name == request.Name);
+
+            if (existingProductGroup != null)
+            {
+                return BadRequest($"Já existe um grupo de produtos com o nome {request.Name} cadastrado");
+            }
+
+
+            var newProductGroup = new ProductGroup
+            {
+                Name = request.Name
+            };
+
+            _context.ProductGroups.Add(newProductGroup);
+            await _context.SaveChangesAsync();
+
+            return Ok(newProductGroup);
         }
 
         [HttpPut("{id}")]

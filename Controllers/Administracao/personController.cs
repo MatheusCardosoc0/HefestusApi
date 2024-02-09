@@ -1,4 +1,5 @@
-﻿using HefestusApi.DTOs.Administracao;
+﻿using AutoMapper;
+using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
@@ -12,21 +13,24 @@ namespace EntityFramework7Relationships.Controllers
     public class personController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public personController(DataContext context)
+        public personController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<Person>> GetPersons()
+        public async Task<ActionResult<PersonDto>> GetPersons()
         {
-            var person = await _context.Person
+            var persons = await _context.Person
                 .Include(c => c.PersonGroups)
                 .Include(c => c.City)
                 .ToListAsync();
+            var personDtos = _mapper.Map<IEnumerable<PersonDto>>(persons);
 
-            return Ok(person);
+            return Ok(personDtos);
         }
 
         [HttpGet("{id}")]
@@ -48,11 +52,15 @@ namespace EntityFramework7Relationships.Controllers
         [HttpPost]
         public async Task<ActionResult<Person>> CreatePerson(PersonDto request)
         {
-            if(request == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (request == null)
             {
                 return BadRequest("Dados do pedido inválidos ou incompletos.");
             }
-            if(request.PersonGroup == null) 
+            if(request.PersonGroups == null) 
             {
                 return BadRequest("Grupo deve ser informada.");
             }
@@ -80,10 +88,10 @@ namespace EntityFramework7Relationships.Controllers
                 Habilities = request.Habilities,
                 Description = request.Description,
                 PersonGroups = new List<PersonGroup>()
-                };
+             };
 
            
-                foreach (var groupDto in request.PersonGroup)
+                foreach (var groupDto in request.PersonGroups)
                 {
                     var existingGroup = await _context.PersonGroup
                         .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);
@@ -158,9 +166,9 @@ namespace EntityFramework7Relationships.Controllers
 
             person.PersonGroups.Clear();
 
-            if (request.PersonGroup != null)
+            if (request.PersonGroups != null)
             {
-                foreach (var groupDto in request.PersonGroup)
+                foreach (var groupDto in request.PersonGroups)
                 {
                     var existingGroup = await _context.PersonGroup
                         .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);

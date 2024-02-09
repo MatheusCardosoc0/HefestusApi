@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Addteste : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace HefestusApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    IBGENumber = table.Column<string>(type: "text", nullable: false),
+                    IBGENumber = table.Column<int>(type: "integer", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<string>(type: "text", nullable: false),
                     LastModifiedAt = table.Column<string>(type: "text", nullable: false)
@@ -117,16 +117,16 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     Age = table.Column<int>(type: "integer", nullable: false),
                     CPF = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
-                    BirthDate = table.Column<string>(type: "text", nullable: false),
-                    IBGE = table.Column<string>(type: "text", nullable: false),
-                    Razao = table.Column<string>(type: "text", nullable: false),
-                    InscricaoEstadual = table.Column<string>(type: "text", nullable: false),
+                    BirthDate = table.Column<string>(type: "text", nullable: true),
+                    IBGE = table.Column<string>(type: "text", nullable: true),
+                    Razao = table.Column<string>(type: "text", nullable: true),
+                    InscricaoEstadual = table.Column<string>(type: "text", nullable: true),
                     CEP = table.Column<string>(type: "text", nullable: false),
                     UrlImage = table.Column<string>(type: "text", nullable: true),
                     IsBlocked = table.Column<bool>(type: "boolean", nullable: true),
@@ -154,10 +154,10 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    PriceSale = table.Column<int>(type: "integer", nullable: false),
-                    PriceTotal = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    PriceSale = table.Column<float>(type: "real", nullable: false),
+                    PriceTotal = table.Column<float>(type: "real", nullable: false),
                     FamilyId = table.Column<int>(type: "integer", nullable: false),
                     GroupId = table.Column<int>(type: "integer", nullable: false),
                     SubgroupId = table.Column<int>(type: "integer", nullable: false)

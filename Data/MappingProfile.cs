@@ -21,6 +21,12 @@ namespace HefestusApi.Data
             CreateMap<PaymentCondition, OrderPaymentConditionViewDto>();
             CreateMap<PaymentOptions, OrderPaymentOptionViewDto>();
             CreateMap<Person, OrderPersonViewDto>();
+
+            CreateMap<Person, PersonDto>()
+                .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.City.State))
+                .ForMember(dest => dest.MainPersonGroup, opt => opt.MapFrom(src => src.PersonGroups[0].Name));
+            CreateMap<PersonGroup, PersonGroupDto>();
+            CreateMap<City, CityDto>();
         }
     }
 }

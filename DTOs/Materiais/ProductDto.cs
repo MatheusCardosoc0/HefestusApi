@@ -3,8 +3,8 @@
     public record struct ProductDto(
         string Name,
         string Description,
-        int PriceSale,
-        int PriceTotal,
+        float PriceSale,
+        float PriceTotal,
         int GroupId,
         ProductGroupDto Group,
         int FamilyId,

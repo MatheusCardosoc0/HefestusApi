@@ -15,6 +15,7 @@
         );
 
     public record struct UserViewDto(
+       int ID,
        string Name,
        UserPersonViewDto Person
        );

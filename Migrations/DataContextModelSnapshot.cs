@@ -34,9 +34,8 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("IBGENumber")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("IBGENumber")
+                        .HasColumnType("integer");
 
                     b.Property<string>("LastModifiedAt")
                         .IsRequired()
@@ -71,7 +70,6 @@ namespace HefestusApi.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("BirthDate")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("CEP")
@@ -100,11 +98,9 @@ namespace HefestusApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("IBGE")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("InscricaoEstadual")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsBlocked")
@@ -119,14 +115,14 @@ namespace HefestusApi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Razao")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UrlImage")
@@ -244,7 +240,8 @@ namespace HefestusApi.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("FamilyId")
                         .HasColumnType("integer");
@@ -254,13 +251,14 @@ namespace HefestusApi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
-                    b.Property<int>("PriceSale")
-                        .HasColumnType("integer");
+                    b.Property<float>("PriceSale")
+                        .HasColumnType("real");
 
-                    b.Property<int>("PriceTotal")
-                        .HasColumnType("integer");
+                    b.Property<float>("PriceTotal")
+                        .HasColumnType("real");
 
                     b.Property<int>("SubgroupId")
                         .HasColumnType("integer");

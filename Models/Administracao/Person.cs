@@ -1,5 +1,6 @@
 ﻿using HefestusApi.Models.Interfaces;
 using HefestusApi.Models.Vendas;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace HefestusApi.Models.Administracao
@@ -7,16 +8,17 @@ namespace HefestusApi.Models.Administracao
     public class Person : TimeTrail
     {
         public int Id { get; set; }
+        [StringLength(50, ErrorMessage = "O nome não pode exceder 50 caracteres.")]
         public string Name { get; set; }
         public string Email { get; set; } 
         public string Phone { get; set; }
         public int Age { get; set; }
         public string CPF { get; set; }
         public string Address { get; set; }
-        public string BirthDate { get; set; }
-        public string IBGE { get; set; }
-        public string Razao { get; set; }
-        public string InscricaoEstadual { get; set; }
+        public string? BirthDate { get; set; }
+        public string? IBGE { get; set; }
+        public string? Razao { get; set; }
+        public string? InscricaoEstadual { get; set; }
         public string CEP { get; set; }
         public string? UrlImage { get; set; } = string.Empty;
         public bool? IsBlocked { get; set; } = false;

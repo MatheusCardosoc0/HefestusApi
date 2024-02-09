@@ -2,7 +2,7 @@
 {
     public record struct CityDto(
         string Name,
-        string IBGENumber,
+        int IBGENumber,
         string State
         );
 }

@@ -44,6 +44,14 @@ namespace HefestusApi.Controllers.PESSOAL
         [HttpPost]
         public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
         {
+            var existingPersonGroup = await _context.PersonGroup.FirstOrDefaultAsync(p => p.Name == request.Name);
+
+            if(existingPersonGroup != null)
+            {
+                return BadRequest($"Já existe um grupo de pessoas com o nome {request.Name} cadastrado");
+            }
+
+
             var newPersonGroup = new PersonGroup
             {
                 Name = request.Name
