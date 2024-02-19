@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240204113301_first")]
-    partial class first
+    [Migration("20240213111615_AddMoreAtributesInPerson")]
+    partial class AddMoreAtributesInPerson
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,11 +97,17 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Gender")
+                        .HasColumnType("text");
+
                     b.Property<string>("Habilities")
                         .HasColumnType("text");
 
                     b.Property<string>("IBGE")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("ICMSContributor")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("InscricaoEstadual")
                         .HasColumnType("text");
@@ -120,6 +126,10 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PersonType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -384,13 +394,13 @@ namespace HefestusApi.Migrations
 
             modelBuilder.Entity("PersonPersonGroup", b =>
                 {
-                    b.Property<int>("PersonGroupsId")
+                    b.Property<int>("PersonGroupId")
                         .HasColumnType("integer");
 
                     b.Property<int>("PersonsId")
                         .HasColumnType("integer");
 
-                    b.HasKey("PersonGroupsId", "PersonsId");
+                    b.HasKey("PersonGroupId", "PersonsId");
 
                     b.HasIndex("PersonsId");
 
@@ -504,7 +514,7 @@ namespace HefestusApi.Migrations
                 {
                     b.HasOne("HefestusApi.Models.Administracao.PersonGroup", null)
                         .WithMany()
-                        .HasForeignKey("PersonGroupsId")
+                        .HasForeignKey("PersonGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

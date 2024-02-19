@@ -41,6 +41,23 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(personGroup);
         }
 
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<PersonGroup>>> GetPersonGroupBySearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var personGroups = await _context.PersonGroup
+                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(personGroups);
+        }
+
         [HttpPost]
         public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
         {

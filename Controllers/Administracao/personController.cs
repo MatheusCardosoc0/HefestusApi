@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
-using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +24,7 @@ namespace EntityFramework7Relationships.Controllers
         public async Task<ActionResult<PersonDto>> GetPersons()
         {
             var persons = await _context.Person
-                .Include(c => c.PersonGroups)
+                .Include(c => c.PersonGroup)
                 .Include(c => c.City)
                 .ToListAsync();
             var personDtos = _mapper.Map<IEnumerable<PersonDto>>(persons);
@@ -33,11 +32,28 @@ namespace EntityFramework7Relationships.Controllers
             return Ok(personDtos);
         }
 
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<PersonDto>>> GetPersonsBySearchTerm(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var persons = await _context.Person
+                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(persons);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Person>> GetPersonById(int id)
         {
             var person = await _context.Person
-                .Include(c => c.PersonGroups)
+                .Include(c => c.PersonGroup)
                 .Include(c => c.City)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -60,7 +76,7 @@ namespace EntityFramework7Relationships.Controllers
             {
                 return BadRequest("Dados do pedido inválidos ou incompletos.");
             }
-            if(request.PersonGroups == null) 
+            if(request.PersonGroup == null) 
             {
                 return BadRequest("Grupo deve ser informada.");
             }
@@ -83,27 +99,30 @@ namespace EntityFramework7Relationships.Controllers
                 InscricaoEstadual = request.InscricaoEstadual,
                 CEP = request.CEP,
                 UrlImage = request.UrlImage,
-                IsBlocked = request.IsBlocked,
+                IsBlocked = false,
                 MaritalStatus = request.MaritalStatus,
                 Habilities = request.Habilities,
                 Description = request.Description,
-                PersonGroups = new List<PersonGroup>()
+                PersonGroup = new List<PersonGroup>(),
+                Gender = request.Gender,
+                ICMSContributor = request.ICMSContributor,
+                PersonType = request.PersonType
              };
 
            
-                foreach (var groupDto in request.PersonGroups)
+                foreach (var groupDto in request.PersonGroup)
                 {
                     var existingGroup = await _context.PersonGroup
                         .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);
 
                     if (existingGroup != null)
                     {
-                        newPerson.PersonGroups.Add(existingGroup);
+                        newPerson.PersonGroup.Add(existingGroup);
                     }
                     else
                     {
                         var newGroup = new PersonGroup { Name = groupDto.Name };
-                        newPerson.PersonGroups.Add(newGroup);
+                        newPerson.PersonGroup.Add(newGroup);
                     }
                 }
 
@@ -139,7 +158,7 @@ namespace EntityFramework7Relationships.Controllers
         public async Task<ActionResult<Person>> UpdatePerson(int id, PersonDto request)
         {
             var person = await _context.Person
-                .Include(c => c.PersonGroups)
+                .Include(c => c.PersonGroup)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (person == null)
@@ -163,24 +182,27 @@ namespace EntityFramework7Relationships.Controllers
             person.MaritalStatus = request.MaritalStatus;
             person.Habilities = request.Habilities;
             person.Description = request.Description;
+            person.Gender = request.Gender;
+            person.ICMSContributor = request.ICMSContributor;
+            person.PersonType = request.PersonType;
 
-            person.PersonGroups.Clear();
+            person.PersonGroup.Clear();
 
-            if (request.PersonGroups != null)
+            if (request.PersonGroup != null)
             {
-                foreach (var groupDto in request.PersonGroups)
+                foreach (var groupDto in request.PersonGroup)
                 {
                     var existingGroup = await _context.PersonGroup
                         .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);
 
                     if (existingGroup != null)
                     {
-                        person.PersonGroups.Add(existingGroup);
+                        person.PersonGroup.Add(existingGroup);
                     }
                     else
                     {
                         var newGroup = new PersonGroup { Name = groupDto.Name };
-                        person.PersonGroups.Add(newGroup);
+                        person.PersonGroup.Add(newGroup);
                     }
                 }
             }

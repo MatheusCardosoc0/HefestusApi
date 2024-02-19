@@ -38,6 +38,21 @@ namespace HefestusApi.Utils
                 .WithMany(c => c.Persons)
                 .HasForeignKey(p => p.CityId);
 
+            modelBuilder.Entity<Person>()
+               .HasIndex(p => p.Name)
+               .HasDatabaseName("IX_Persons_Name")
+               .IsUnique(false);
+
+            modelBuilder.Entity<PersonGroup>()
+               .HasIndex(p => p.Name)
+               .HasDatabaseName("IX_PersonGroups_Name")
+               .IsUnique(false);
+
+            modelBuilder.Entity<City>()
+                .HasIndex(c => c.Name)
+                .HasDatabaseName("IX_Cities_Name") 
+                .IsUnique(false); 
+
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Family)
                 .WithMany() 

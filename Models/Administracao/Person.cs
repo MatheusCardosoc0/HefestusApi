@@ -25,10 +25,12 @@ namespace HefestusApi.Models.Administracao
         public string? MaritalStatus { get; set; } = string.Empty;
         public string? Habilities { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
-
+        public string? Gender { get; set; } = string.Empty;
+        public bool? ICMSContributor { get; set; } = false;
+        public string PersonType {  get; set; } = string.Empty;
         public int CityId { get; set; }
         public City City { get; set; }
-        public List<PersonGroup> PersonGroups { get; set; }
+        public List<PersonGroup> PersonGroup { get; set; }
         [JsonIgnore]
         public User User { get; set; }
         [JsonIgnore]

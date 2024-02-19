@@ -230,15 +230,15 @@ namespace HefestusApi.Migrations
                 name: "PersonPersonGroup",
                 columns: table => new
                 {
-                    PersonGroupsId = table.Column<int>(type: "integer", nullable: false),
+                    PersonGroupId = table.Column<int>(type: "integer", nullable: false),
                     PersonsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PersonPersonGroup", x => new { x.PersonGroupsId, x.PersonsId });
+                    table.PrimaryKey("PK_PersonPersonGroup", x => new { x.PersonGroupId, x.PersonsId });
                     table.ForeignKey(
-                        name: "FK_PersonPersonGroup_PersonGroup_PersonGroupsId",
-                        column: x => x.PersonGroupsId,
+                        name: "FK_PersonPersonGroup_PersonGroup_PersonGroupId",
+                        column: x => x.PersonGroupId,
                         principalTable: "PersonGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);

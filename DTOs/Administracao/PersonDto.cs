@@ -18,11 +18,14 @@ public record struct PersonDto(
         string? MaritalStatus,
         string? Habilities,
         string? Description,
-        List<PersonGroupDto> PersonGroups,
+        List<PersonGroupDto> PersonGroup,
         int CityId,
         CityDto City,
-        string State,
-        string MainPersonGroup
+        string? State,
+        string? MainPersonGroup,
+        string? Gender,
+        bool? ICMSContributor ,
+        string PersonType
         );
 };
 

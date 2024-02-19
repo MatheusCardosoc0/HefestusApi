@@ -3,6 +3,7 @@ using System;
 using HefestusApi.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240212192526_first")]
+    partial class first
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,9 +53,6 @@ namespace HefestusApi.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .HasDatabaseName("IX_Cities_Name");
 
                     b.ToTable("Cities");
                 });
@@ -97,17 +97,11 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Gender")
-                        .HasColumnType("text");
-
                     b.Property<string>("Habilities")
                         .HasColumnType("text");
 
                     b.Property<string>("IBGE")
                         .HasColumnType("text");
-
-                    b.Property<bool?>("ICMSContributor")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("InscricaoEstadual")
                         .HasColumnType("text");
@@ -127,10 +121,6 @@ namespace HefestusApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("PersonType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("text");
@@ -144,9 +134,6 @@ namespace HefestusApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
-
-                    b.HasIndex("Name")
-                        .HasDatabaseName("IX_Persons_Name");
 
                     b.ToTable("Person");
                 });
@@ -172,9 +159,6 @@ namespace HefestusApi.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .HasDatabaseName("IX_PersonGroups_Name");
 
                     b.ToTable("PersonGroup");
                 });

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HefestusApi.DTOs.Administracao;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace HefestusApi.Controllers.Others
 {
@@ -7,8 +9,8 @@ namespace HefestusApi.Controllers.Others
     [ApiController]
     public class fetchCityDataIBGEController : ControllerBase
     {
-        [HttpGet("fetchData/{id}")]
-        public async Task<IActionResult> FetchData(string id)
+        [HttpGet("fetchData/{id}/{searchTerm}")]
+        public async Task<IActionResult> FetchData(string id,  string searchTerm)
         {
             string state = id;
             string apiUrl = $"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{state}/municipios";
@@ -27,15 +29,18 @@ namespace HefestusApi.Controllers.Others
                     string responseBody = await response.Content.ReadAsStringAsync();
                     var rawCities = JsonConvert.DeserializeObject<List<CityData>>(responseBody);
 
-                    var cities = rawCities.Select(city => new
-                    {
-                        Id = city.Id,
-                        IbgeNumber = city.Id,
-                        Name = city.Name,
-                        State = city.microrregiao.mesorregiao.UF.sigla
-                    }).ToList();
+                    var filteredCities = rawCities
+                        .Where(city => CultureInfo.InvariantCulture.CompareInfo.IndexOf(city.Name, searchTerm, CompareOptions.IgnoreCase) >= 0)
+                        .Select(city => new
+                        {
+                            Id = city.Id,
+                            IbgeNumber = city.Id,
+                            Name = city.Name,
+                            State = city.microrregiao.mesorregiao.UF.sigla
+                        })
+                        .ToList();
 
-                    return Ok(cities);
+                    return Ok(filteredCities);
                 }
                 catch (HttpRequestException e)
                 {
@@ -69,5 +74,4 @@ namespace HefestusApi.Controllers.Others
         public string Name { get; set; }
         public Microrregiao microrregiao { get; set; }
     }
-
 }

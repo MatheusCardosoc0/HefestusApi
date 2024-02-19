@@ -1,7 +1,6 @@
 ﻿using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,10 +39,34 @@ namespace HefestusApi.Controllers.Administracao
 
             return Ok(city);
         }
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<City>>> GetCityBySearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var cities = await _context.Cities
+                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(cities);
+        }
 
         [HttpPost]
         public async Task<ActionResult<City>> CreateCity(CityDto request)
         {
+            var checkCity = await _context.Cities
+                .FirstOrDefaultAsync(c => c.IBGENumber == request.IBGENumber);
+
+            if (checkCity != null)
+            {
+                return BadRequest($"Cidade com o número de IBGE{checkCity.IBGENumber} já cadastrada");
+            }
+
             var newCity = new City
             {
                 Name = request.Name,
