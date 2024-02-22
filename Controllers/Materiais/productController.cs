@@ -1,4 +1,5 @@
-﻿using HefestusApi.DTOs.Produtos;
+﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
@@ -44,6 +45,23 @@ namespace HefestusApi.Controllers.Produtos
             }
 
             return Ok(product);
+        }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetPersonsBySearchTerm(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var products = await _context.Product
+                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(products);
         }
 
         [HttpPost]

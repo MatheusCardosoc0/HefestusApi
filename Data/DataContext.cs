@@ -51,7 +51,27 @@ namespace HefestusApi.Utils
             modelBuilder.Entity<City>()
                 .HasIndex(c => c.Name)
                 .HasDatabaseName("IX_Cities_Name") 
-                .IsUnique(false); 
+                .IsUnique(false);
+
+            modelBuilder.Entity<Product>()
+                .HasIndex(c => c.Name)
+                .HasDatabaseName("IX_Products_Name")
+                .IsUnique(false);
+
+            modelBuilder.Entity<ProductGroup>()
+               .HasIndex(c => c.Name)
+               .HasDatabaseName("IX_Products_Name")
+               .IsUnique(false);
+
+            modelBuilder.Entity<ProductFamily>()
+               .HasIndex(c => c.Name)
+               .HasDatabaseName("IX_ProductFamilies_Name")
+               .IsUnique(false);
+
+            modelBuilder.Entity<ProductSubGroup>()
+               .HasIndex(c => c.Name)
+               .HasDatabaseName("IX_ProductSubGroups_Name")
+               .IsUnique(false);
 
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Family)

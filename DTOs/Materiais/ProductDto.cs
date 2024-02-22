@@ -10,6 +10,10 @@
         int FamilyId,
         ProductFamilyDto Family,
         int SubGroupId,
-        ProductSubGroupDto Subgroup
+        ProductSubGroupDto Subgroup,
+        float MinPriceSale,
+        float MaxPriceSale,
+        float BruteCost,
+        float LiquidCost
         );
 }

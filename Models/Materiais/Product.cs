@@ -13,7 +13,12 @@ namespace HefestusApi.Models.Produtos
         [MaxDecimalPlaces(4, ErrorMessage = "O preço de venda não pode ter mais de 4 casas decimais.")]
         public float PriceSale { get; set; }
         [MaxDecimalPlaces(4, ErrorMessage = "O preço de venda não pode ter mais de 4 casas decimais.")]
+        public float MinPriceSale { get; set; }
+        public float MaxPriceSale { get; set; }
+
         public float PriceTotal { get; set; }
+        public float BruteCost { get; set; }
+        public float LiquidCost { get; set; }
 
         public int FamilyId { get; set; }
         public int GroupId { get; set; }
