@@ -60,7 +60,7 @@ namespace HefestusApi.Utils
 
             modelBuilder.Entity<ProductGroup>()
                .HasIndex(c => c.Name)
-               .HasDatabaseName("IX_Products_Name")
+               .HasDatabaseName("IX_ProductGroups_Name")
                .IsUnique(false);
 
             modelBuilder.Entity<ProductFamily>()

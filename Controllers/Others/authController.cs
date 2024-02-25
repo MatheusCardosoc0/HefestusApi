@@ -36,7 +36,7 @@ namespace HefestusApi.Controllers.Others
 
             bool validPassword = BCrypt.Net.BCrypt.Verify(userCredentials.Password, user.Password);
             if (!validPassword)
-                return BadRequest(new {message = "Senha incorreta" });
+                return BadRequest("Senha incorreta");
 
             var token = _tokenGenerator.GenerateToken(user);
 

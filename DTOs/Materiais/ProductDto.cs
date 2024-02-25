@@ -1,19 +1,33 @@
 ﻿namespace HefestusApi.DTOs.Produtos
 {
     public record struct ProductDto(
+        int Id,
         string Name,
-        string Description,
-        float PriceSale,
-        float PriceTotal,
-        int GroupId,
-        ProductGroupDto Group,
-        int FamilyId,
-        ProductFamilyDto Family,
-        int SubGroupId,
-        ProductSubGroupDto Subgroup,
+        string? Description,
         float MinPriceSale,
-        float MaxPriceSale,
+        decimal AverageCost,
+        float PromotionalPrice,
+        float PriceSale,
         float BruteCost,
-        float LiquidCost
-        );
+        float LiquidCost,
+        float WholesalePrice,
+        float MinWholesalePrice,
+        string? UrlImage,
+        int NCM,
+        string GTIN,
+        string? GTINtrib,
+        int FamilyId,
+        int GroupId,
+        int SubGroupId,
+        string? Reference,
+        string? Batch,
+        string? GroupName,
+        string? SubGroupName,
+        string? FamilyName,
+
+        ProductFamilyDto Family,
+        ProductGroupDto Group,
+        ProductSubGroupDto Subgroup
+    );
 }
+

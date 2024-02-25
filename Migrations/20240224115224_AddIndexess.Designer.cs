@@ -3,6 +3,7 @@ using System;
 using HefestusApi.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240224115224_AddIndexess")]
+    partial class AddIndexess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,28 +260,16 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AverageCost")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Batch")
-                        .HasColumnType("text");
-
                     b.Property<float>("BruteCost")
                         .HasColumnType("real");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<int>("FamilyId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("GTIN")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("GTINtrib")
-                        .HasColumnType("text");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
@@ -286,14 +277,11 @@ namespace HefestusApi.Migrations
                     b.Property<float>("LiquidCost")
                         .HasColumnType("real");
 
+                    b.Property<float>("MaxPriceSale")
+                        .HasColumnType("real");
+
                     b.Property<float>("MinPriceSale")
                         .HasColumnType("real");
-
-                    b.Property<float>("MinWholesalePrice")
-                        .HasColumnType("real");
-
-                    b.Property<int>("NCM")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -303,20 +291,11 @@ namespace HefestusApi.Migrations
                     b.Property<float>("PriceSale")
                         .HasColumnType("real");
 
-                    b.Property<float>("PromotionalPrice")
+                    b.Property<float>("PriceTotal")
                         .HasColumnType("real");
-
-                    b.Property<string>("Reference")
-                        .HasColumnType("text");
 
                     b.Property<int>("SubgroupId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("UrlImage")
-                        .HasColumnType("text");
-
-                    b.Property<float>("WholesalePrice")
-                        .HasColumnType("real");
 
                     b.HasKey("Id");
 

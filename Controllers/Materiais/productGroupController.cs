@@ -11,11 +11,11 @@ namespace HefestusApi.Controllers.Produtos
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class productGroupsController : ControllerBase
+    public class productGroupController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public productGroupsController(DataContext context)
+        public productGroupController(DataContext context)
         {
             _context = context;
         }
@@ -72,6 +72,60 @@ namespace HefestusApi.Controllers.Produtos
             }
 
             return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ProductGroup>> DeleteProductGroup(int id)
+        {
+            var verifyProdutFamily = await _context.ProductGroups.FindAsync(id);
+
+            if (verifyProdutFamily == null)
+            {
+                return BadRequest($"Familia de produtos com o id {id} não encontrado");
+            }
+
+            try
+            {
+                _context.ProductGroups.Remove(verifyProdutFamily);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return BadRequest("Não foi possivel deletar familia de produtos");
+            }
+
+            return NoContent();
+        }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<ProductGroup>>> GetPersonGroupBySearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var productSubGroup = await _context.ProductGroups
+                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(productSubGroup);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductGroup>> GetProductGroupById(int id)
+        {
+            var productSubGroup = await _context.ProductGroups
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (productSubGroup == null)
+            {
+                return NotFound($"Familia de produtos com o ID {id} não existe");
+            }
+
+            return Ok(productSubGroup);
         }
     }
 }

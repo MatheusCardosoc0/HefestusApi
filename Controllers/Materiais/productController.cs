@@ -1,4 +1,5 @@
-﻿using HefestusApi.DTOs.Administracao;
+﻿using AutoMapper;
+using HefestusApi.DTOs.Administracao;
 using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Models.Produtos;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace HefestusApi.Controllers.Produtos
 {
@@ -15,20 +18,23 @@ namespace HefestusApi.Controllers.Produtos
     public class productController : ControllerBase
     {
         private readonly DataContext _context;
-        public productController(DataContext context)
+        private readonly IMapper _mapper;
+        public productController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet]
-        public async Task<ActionResult<Product>> GetProduct()
+        public async Task<ActionResult<ProductDto>> GetProduct()
         {
             var product = await _context.Product
                 .Include(c => c.Group)
                 .Include(c => c.Subgroup)
                 .Include(c => c.Family)
                 .ToListAsync();
+            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(product);
 
-            return Ok(product);
+            return Ok(productDtos);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
@@ -47,23 +53,6 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(product);
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetPersonsBySearchTerm(string searchTerm)
-        {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-                return BadRequest("Não foi informado um termo de pesquisa");
-            }
-
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            var products = await _context.Product
-                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
-
-            return Ok(products);
-        }
-
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(ProductDto request)
         {
@@ -71,11 +60,23 @@ namespace HefestusApi.Controllers.Produtos
             {
                 Name = request.Name,
                 Description = request.Description,
-                PriceTotal = request.PriceTotal,
                 PriceSale = request.PriceSale,
                 FamilyId = request.FamilyId,
                 GroupId = request.GroupId,
                 SubgroupId = request.SubGroupId,
+                LiquidCost = request.LiquidCost,
+                BruteCost = request.BruteCost,
+                GTIN = request.GTIN,
+                NCM = request.NCM,
+                AverageCost = request.AverageCost,
+                Batch = request.Batch,
+                GTINtrib = request.GTINtrib,
+                MinWholesalePrice = request.MinWholesalePrice,
+                PromotionalPrice = request.PromotionalPrice,
+                Reference = request.Reference,
+                UrlImage = request.UrlImage,
+                WholesalePrice = request.WholesalePrice,
+                MinPriceSale = request.MinPriceSale,
                 Group = new ProductGroup(),
                 Family = new ProductFamily(),
                 Subgroup = new ProductSubGroup(),
@@ -172,10 +173,25 @@ namespace HefestusApi.Controllers.Produtos
                 return NotFound($"Produto com o id {id} não existe");
             }
 
-            product.Name = request.Name;
-            product.Description = request.Description;
-            product.PriceSale = request.PriceSale;
-            product.PriceTotal = request.PriceTotal;
+                product.Name = request.Name;
+                product.Description = request.Description;
+                product.PriceSale = request.PriceSale;
+                product.FamilyId = request.FamilyId;
+                product.GroupId = request.GroupId;
+                product.SubgroupId = request.SubGroupId;
+                product.LiquidCost = request.LiquidCost;
+                product.BruteCost = request.BruteCost;
+                product.GTIN = request.GTIN;
+                product.NCM = request.NCM;
+                product.AverageCost = request.AverageCost;
+                product.Batch = request.Batch;
+                product.GTINtrib = request.GTINtrib;
+                product.MinWholesalePrice = request.MinWholesalePrice;
+                product.PromotionalPrice = request.PromotionalPrice;
+                product.Reference = request.Reference;
+                product.UrlImage = request.UrlImage;
+                product.WholesalePrice = request.WholesalePrice;
+                product.MinPriceSale = request.MinPriceSale;
 
             if (request.Group != null)
             {
@@ -276,6 +292,26 @@ namespace HefestusApi.Controllers.Produtos
             }
 
             return NoContent();
+        }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductSearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var product = await _context.Product
+                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .Include(p => p.Subgroup)
+                .Include(p => p.Family)
+                .Include(p => p.Group)
+                .ToListAsync();
+
+            return Ok(product);
         }
     }
 }
