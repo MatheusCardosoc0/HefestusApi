@@ -23,7 +23,8 @@
         string? Batch,
         string? GroupName,
         string? SubGroupName,
-        string? FamilyName
+        string? FamilyName,
+        string UnitOfMensuration
     );
 
     public record struct ProductPostOrPutDto(
@@ -46,7 +47,8 @@
         int GroupId,
         int SubGroupId,
         string? Reference,
-        string? Batch
+        string? Batch,
+        string UnitOfMensuration
     );
 
     public record struct ProductSearchTermDto (

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HefestusApi.DTOs.Administracao;
+using HefestusApi.DTOs.Financeiro;
 using HefestusApi.DTOs.Produtos;
 using HefestusApi.DTOs.Vendas;
 using HefestusApi.Models.Administracao;
@@ -15,13 +16,17 @@ namespace HefestusApi.Data
         {
             CreateMap<User, UserViewDto>();
             CreateMap<Person, UserPersonViewDto>();
-            CreateMap<Order, OrderViewDto>();
-            CreateMap<OrderProduct, OrderProductViewDto>()
-                .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product));
-            CreateMap<Product, OrderProductDataViewDto>();
-            CreateMap<PaymentCondition, OrderPaymentConditionViewDto>();
-            CreateMap<PaymentOptions, OrderPaymentOptionViewDto>();
-            CreateMap<Person, OrderPersonViewDto>();
+
+            CreateMap<Order, OrderDto>()
+                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.Name))
+                .ForMember(dest => dest.ResponsibleName, opt => opt.MapFrom(src => src.Responsible.Name))
+                .ForMember(dest => dest.PaymentConditionName, opt => opt.MapFrom(src => src.PaymentCondition.Name))
+                .ForMember(dest => dest.PaymentOptionName, opt => opt.MapFrom(src => src.PaymentOption.Name));
+            CreateMap<OrderProduct, OrderProductDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src.Product.Batch));
+            CreateMap<PaymentCondition, PaymentConditionDto>();
+            CreateMap<PaymentOptions, PaymentOptionsDto>();
 
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Group.Name))

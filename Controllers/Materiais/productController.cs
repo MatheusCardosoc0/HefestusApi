@@ -77,6 +77,7 @@ namespace HefestusApi.Controllers.Produtos
                 UrlImage = request.UrlImage,
                 WholesalePrice = request.WholesalePrice,
                 MinPriceSale = request.MinPriceSale,
+                UnitOfMensuration = request.UnitOfMensuration,
                 Group = new ProductGroup(),
                 Family = new ProductFamily(),
                 Subgroup = new ProductSubGroup(),
@@ -164,6 +165,7 @@ namespace HefestusApi.Controllers.Produtos
                 product.UrlImage = request.UrlImage;
                 product.WholesalePrice = request.WholesalePrice;
                 product.MinPriceSale = request.MinPriceSale;
+                product.UnitOfMensuration = request.UnitOfMensuration;
 
             var existingProductGroup = await _context.ProductGroups
                     .FindAsync(request.GroupId);

@@ -105,7 +105,7 @@ namespace HefestusApi.Utils
                 .HasForeignKey(p => p.SubgroupId);
 
             modelBuilder.Entity<OrderProduct>()
-                .HasKey(op => new { op.OrderId, op.ProductId });
+                .HasKey(op => new { op.Id });
 
             modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Order)

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Vendas;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace HefestusApi.Models.Produtos
@@ -35,6 +37,7 @@ namespace HefestusApi.Models.Produtos
         public int SubgroupId { get; set; }
         public string? Reference {  get; set; }
         public string? Batch {  get; set; }
+        public string UnitOfMensuration { get; set; }
 
         public required ProductFamily Family { get; set; }
         public required ProductGroup Group { get; set; }

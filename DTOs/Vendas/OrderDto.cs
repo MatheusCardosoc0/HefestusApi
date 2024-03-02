@@ -3,64 +3,59 @@
 namespace HefestusApi.DTOs.Vendas
 {
     public record struct OrderDto(
-        OrderPersonDto Client,
-        OrderPersonDto Responsible,
+        int Id,
+        int ClientId,
+        string ClientName,
+        int ResponsibleId,
+        string ResponsibleName,
         List<OrderProductDto> OrderProducts,
-        OrderPaymentConditionDto PaymentCondition,
-        OrderPaymentOptionDto PaymentOption,
-        decimal Value
+        int PaymentConditionId,
+        string PaymentConditionName,
+        int PaymentOptionId,
+        string PaymentOptionName,
+        int? InvoiceId,
+        decimal TotalValue,
+        decimal LiquidValue,
+        decimal BruteValue,
+        float Discount,
+        string TypeOrder,
+        float? CostOfFreight,
+        string? TypeFreight,
+        string DateOfCompletion
         );
 
-    public record struct OrderViewDto(
-       OrderPersonViewDto Client,
-       OrderPersonViewDto Responsible,
-       List<OrderProductViewDto> OrderProducts,
-       OrderPaymentConditionViewDto PaymentCondition,
-       OrderPaymentOptionViewDto PaymentOption,
-       decimal Value
-       );
+    public record struct OrderPostOrPutDto(
+        int Id,
+        int ClientId,
+        int ResponsibleId,
+        List<OrderProductPostOrPutDto> OrderProducts,
+        int PaymentConditionId,
+        int PaymentOptionId,
+        int? InvoiceId,
+        decimal TotalValue,
+        decimal LiquidValue,
+        decimal BruteValue,
+        float Discount,
+        string TypeOrder,
+        float? CostOfFreight,
+        string? TypeFreight
+        );
 
     public record struct OrderProductDto(
          int OrderId,
          int ProductId,
-         decimal Price
+         string ProductName,
+         decimal UnitPrice,
+         float Amount,
+         string? Batch,
+         decimal TotalPrice
         );
 
-    public record struct OrderPersonDto(
-        int Id
-        );
-
-    public record struct OrderPaymentConditionDto(
-        int Id
-        );
-
-    public record struct OrderPaymentOptionDto(
-       int Id
-       );
-
-    public record struct OrderProductViewDto(
+    public record struct OrderProductPostOrPutDto(
          int OrderId,
          int ProductId,
-         OrderProductDataViewDto Product,
-         decimal Price
+         decimal UnitPrice,
+         float Amount,
+         decimal TotalPrice
         );
-    public record struct OrderProductDataViewDto(
-        string Name
-        );
-
-
-    public record struct OrderPersonViewDto(
-        int Id,
-        string Name
-        );
-
-    public record struct OrderPaymentConditionViewDto(
-        int Id,
-        string Name
-        );
-
-    public record struct OrderPaymentOptionViewDto(
-       int Id,
-       string Name
-       );
 }

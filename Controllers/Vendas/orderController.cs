@@ -34,78 +34,67 @@ namespace HefestusApi.Controllers.Vendas
                 .Include(o => o.PaymentCondition)
                 .ToListAsync();
 
-            var orderDtos = _mapper.Map<IEnumerable<OrderViewDto>>(orders);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
             return Ok(orderDtos);
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> PostOrder(OrderDto request)
+        public async Task<ActionResult<OrderDto>> PostOrder(OrderPostOrPutDto request)
         {
             if (request == null || request.OrderProducts == null || !request.OrderProducts.Any())
             {
                 return BadRequest("Dados do pedido inválidos ou incompletos.");
             }
 
-            var newOrder = new Order
-            {
-                Value = request.Value,
-                OrderProducts = new List<OrderProduct>()
-            };
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var client = await _context.Person.FindAsync(request.Client.Id);
-            if (client == null)
-            {
-                return BadRequest("Cliente não encontrado.");
-            }
-            newOrder.ClientId = client.Id;
-            newOrder.Client = client;
-
-            var responsible = await _context.Person.FindAsync(request.Responsible.Id);
-            if (responsible == null)
-            {
-                return BadRequest("Responsável não encontrado.");
-            }
-            newOrder.ResponsibleId = responsible.Id;
-            newOrder.Responsible = responsible;
-
-            var paymentCondition = await _context.PaymentCondition.FindAsync(request.PaymentCondition.Id);
-            if (paymentCondition == null)
-            {
-                return BadRequest("Condição de pagamento não encontrada.");
-            }
-            newOrder.PaymentConditionId = paymentCondition.Id;
-            newOrder.PaymentCondition = paymentCondition;
-
-            var paymentOption = await _context.PaymentOptions.FindAsync(request.PaymentCondition.Id);
-            if (paymentOption == null)
-            {
-                return BadRequest("Opção de pagamento não encontrada.");
-            }
-            newOrder.PaymentOptionId = paymentOption.Id;
-            newOrder.PaymentOption = paymentOption;
-
-            foreach (var orderProductDto in request.OrderProducts)
-            {
-                var product = await _context.Product.FindAsync(orderProductDto.ProductId);
-                if (product == null)
+           
+                var newOrder = new Order
                 {
-                    return BadRequest($"Produto com ID {orderProductDto.ProductId} não encontrado.");
+                    ClientId = request.ClientId,
+                    ResponsibleId = request.ResponsibleId,
+                    PaymentConditionId = request.PaymentConditionId,
+                    PaymentOptionId = request.PaymentOptionId,
+                    InvoiceId = request.InvoiceId,
+                    TotalValue = request.TotalValue,
+                    LiquidValue = request.LiquidValue,
+                    BruteValue = request.BruteValue,
+                    Discount = request.Discount,
+                    TypeOrder = request.TypeOrder,
+                    CostOfFreight = request.CostOfFreight ?? 0,
+                    TypeFreight = request.TypeFreight,
+                    OrderProducts = new List<OrderProduct>()
+                };
+
+                _context.Order.Add(newOrder);
+                await _context.SaveChangesAsync();
+
+                foreach (var orderProductDto in request.OrderProducts)
+                {
+                    var product = await _context.Product.FindAsync(orderProductDto.ProductId);
+                    if (product == null)
+                    {
+                        return BadRequest($"Produto com ID {orderProductDto.ProductId} não encontrado.");
+                    }
+
+                    var orderProduct = new OrderProduct
+                    {
+                        OrderId = newOrder.Id,
+                        ProductId = product.Id,
+                        Amount = orderProductDto.Amount,
+                        UnitPrice = orderProductDto.UnitPrice,
+                        TotalPrice = orderProductDto.TotalPrice
+                    };
+
+                    _context.OrderProduct.Add(orderProduct);
                 }
 
-                var orderProduct = new OrderProduct
-                {
-                    Product = product,
-                    Price = orderProductDto.Price
-                };
-                newOrder.OrderProducts.Add(orderProduct);
-            }
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-            _context.Order.Add(newOrder);
-            await _context.SaveChangesAsync();
-
+                return Ok(newOrder);
             
-            //var orderDto = /* Método para converter Order em OrderDto */;
-            return Ok(newOrder);
+           
         }
 
     }

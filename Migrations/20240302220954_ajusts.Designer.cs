@@ -3,6 +3,7 @@ using System;
 using HefestusApi.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240302220954_ajusts")]
+    partial class ajusts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,9 +426,8 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("real");
 
-                    b.Property<string>("DateOfCompletion")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateOfCompletion")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<float>("Discount")
                         .HasColumnType("real");
@@ -471,20 +473,14 @@ namespace HefestusApi.Migrations
 
             modelBuilder.Entity("HefestusApi.Models.Vendas.OrderProduct", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("Amount")
-                        .HasColumnType("real");
-
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
+
+                    b.Property<float>("Amount")
+                        .HasColumnType("real");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
@@ -492,9 +488,7 @@ namespace HefestusApi.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
+                    b.HasKey("OrderId", "ProductId");
 
                     b.HasIndex("ProductId");
 

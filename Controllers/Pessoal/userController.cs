@@ -111,10 +111,6 @@ namespace HefestusApi.Controllers.Administracao
                 {
                     return NotFound($"Person com o ID {request.PersonId} não encontrado");
                 }
-                if(person.UserId != user.Id)
-                {
-                    return BadRequest($"Pessoa com o id {request.PersonId} já possui outro usuário relacionado");
-                }
 
                 user.Person = person;
             }
