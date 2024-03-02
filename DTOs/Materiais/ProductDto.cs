@@ -23,11 +23,35 @@
         string? Batch,
         string? GroupName,
         string? SubGroupName,
-        string? FamilyName,
+        string? FamilyName
+    );
 
-        ProductFamilyDto Family,
-        ProductGroupDto Group,
-        ProductSubGroupDto Subgroup
+    public record struct ProductPostOrPutDto(
+        int Id,
+        string Name,
+        string? Description,
+        float MinPriceSale,
+        decimal AverageCost,
+        float PromotionalPrice,
+        float PriceSale,
+        float BruteCost,
+        float LiquidCost,
+        float WholesalePrice,
+        float MinWholesalePrice,
+        string? UrlImage,
+        int NCM,
+        string GTIN,
+        string? GTINtrib,
+        int FamilyId,
+        int GroupId,
+        int SubGroupId,
+        string? Reference,
+        string? Batch
+    );
+
+    public record struct ProductSearchTermDto (
+        int Id,
+        string Name
     );
 }
 

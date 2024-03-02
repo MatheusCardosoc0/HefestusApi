@@ -39,9 +39,15 @@ namespace HefestusApi.Utils
                 .HasForeignKey(p => p.CityId);
 
             modelBuilder.Entity<Person>()
+               .HasOne(p => p.User)
+               .WithOne(c => c.Person)
+               .HasForeignKey<Person>(p => p.UserId);
+
+            modelBuilder.Entity<Person>()
                .HasIndex(p => p.Name)
                .HasDatabaseName("IX_Persons_Name")
                .IsUnique(false);
+
 
             modelBuilder.Entity<PersonGroup>()
                .HasIndex(p => p.Name)
@@ -71,6 +77,16 @@ namespace HefestusApi.Utils
             modelBuilder.Entity<ProductSubGroup>()
                .HasIndex(c => c.Name)
                .HasDatabaseName("IX_ProductSubGroups_Name")
+               .IsUnique(false);
+
+            modelBuilder.Entity<PaymentCondition>()
+              .HasIndex(c => c.Name)
+              .HasDatabaseName("IX_PaymentConditions_Name")
+              .IsUnique(false);
+
+            modelBuilder.Entity<PaymentOptions>()
+               .HasIndex(c => c.Name)
+               .HasDatabaseName("IX_PaymentOptions_Name")
                .IsUnique(false);
 
             modelBuilder.Entity<Product>()

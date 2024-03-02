@@ -1,4 +1,6 @@
-﻿namespace HefestusApi.Models.Administracao
+﻿using System.Text.Json.Serialization;
+
+namespace HefestusApi.Models.Administracao
 {
     public class User
     {

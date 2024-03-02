@@ -33,7 +33,7 @@ namespace EntityFramework7Relationships.Controllers
         }
 
         [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PersonDto>>> GetPersonsBySearchTerm(string searchTerm)
+        public async Task<ActionResult<IEnumerable<PersonSearchTermDto>>> GetPersonsBySearchTerm(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -44,6 +44,7 @@ namespace EntityFramework7Relationships.Controllers
 
             var persons = await _context.Person
                 .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .Select(p => new PersonSearchTermDto { Id = p.Id, Name = p.Name})
                 .ToListAsync();
 
             return Ok(persons);
@@ -66,7 +67,7 @@ namespace EntityFramework7Relationships.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Person>> CreatePerson(PersonDto request)
+        public async Task<ActionResult<PersonDto>> CreatePerson(PersonPostOrPutDto request)
         {
             if (!ModelState.IsValid)
             {
@@ -76,16 +77,21 @@ namespace EntityFramework7Relationships.Controllers
             {
                 return BadRequest("Dados do pedido inválidos ou incompletos.");
             }
-            if(request.PersonGroup == null) 
+            if(request.PersonGroupIds == null) 
             {
                 return BadRequest("Grupo deve ser informada.");
             }
-            if (request.City == null)
+            if (request.CityId == null)
             {
                 return BadRequest("Cidade deve ser informada.");
             }
 
-                var newPerson = new Person
+            if (request.PersonGroupIds == null || !request.PersonGroupIds.Any())
+            {
+                return BadRequest("Pelo menos um Grupo deve ser informado.");
+            }
+
+            var newPerson = new Person
             {
                 Name = request.Name,
                 Email = request.Email,
@@ -110,10 +116,10 @@ namespace EntityFramework7Relationships.Controllers
              };
 
            
-                foreach (var groupDto in request.PersonGroup)
+                foreach (var groupId in request.PersonGroupIds)
                 {
                     var existingGroup = await _context.PersonGroup
-                        .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);
+                        .FindAsync(groupId);
 
                     if (existingGroup != null)
                     {
@@ -121,15 +127,14 @@ namespace EntityFramework7Relationships.Controllers
                     }
                     else
                     {
-                        var newGroup = new PersonGroup { Name = groupDto.Name };
-                        newPerson.PersonGroup.Add(newGroup);
+                        return BadRequest($"Grupo de pessoas {groupId} não encontrada");
                     }
                 }
 
 
             
                 var existingCity = await _context.Cities
-                    .FirstOrDefaultAsync(pg => pg.IBGENumber == request.City.IBGENumber);
+                    .FindAsync(request.CityId);
 
                 if (existingCity != null)
                 {
@@ -138,11 +143,7 @@ namespace EntityFramework7Relationships.Controllers
                 }
                 else
                 {
-                    var newCity = new City { Name = request.City.Name, IBGENumber = request.City.IBGENumber, State = request.City.State };
-                    _context.Cities.Add(newCity);
-                    await _context.SaveChangesAsync();
-                    newPerson.City = newCity;
-                    newPerson.CityId = newCity.Id;
+                    return BadRequest($"Cidade {request.CityId} não encontrada");
                 }
             
             
@@ -150,12 +151,12 @@ namespace EntityFramework7Relationships.Controllers
             _context.Person.Add(newPerson);
             await _context.SaveChangesAsync();
 
-            return Ok(newPerson);
+            return NoContent();
         }
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Person>> UpdatePerson(int id, PersonDto request)
+        public async Task<ActionResult<PersonDto>> UpdatePerson(int id, PersonPostOrPutDto request)
         {
             var person = await _context.Person
                 .Include(c => c.PersonGroup)
@@ -188,70 +189,37 @@ namespace EntityFramework7Relationships.Controllers
 
             person.PersonGroup.Clear();
 
-            if (request.PersonGroup != null)
+            foreach (var groupId in request.PersonGroupIds)
             {
-                foreach (var groupDto in request.PersonGroup)
+                var existingGroup = await _context.PersonGroup
+                    .FindAsync(groupId);
+
+                if (existingGroup != null)
                 {
-                    var existingGroup = await _context.PersonGroup
-                        .FirstOrDefaultAsync(pg => pg.Name == groupDto.Name);
-
-                    if (existingGroup != null)
-                    {
-                        person.PersonGroup.Add(existingGroup);
-                    }
-                    else
-                    {
-                        var newGroup = new PersonGroup { Name = groupDto.Name };
-                        person.PersonGroup.Add(newGroup);
-                    }
-                }
-            }
-            else
-            {
-                return BadRequest("Grupo deve ser informada.");
-            }
-
-            if (request.City != null)
-            {
-                var existingCity = await _context.Cities
-                    .FirstOrDefaultAsync(pg => pg.IBGENumber == request.City.IBGENumber);
-
-                if (existingCity != null)
-                {
-                    person.City = existingCity;
-                    person.CityId = existingCity.Id;
+                    person.PersonGroup.Add(existingGroup);
                 }
                 else
                 {
-                    var newCity = new City { Name = request.City.Name, IBGENumber = request.City.IBGENumber, State = request.City.State };
-                    _context.Cities.Add(newCity);
-                    await _context.SaveChangesAsync();
-                    person.City = newCity;
-                    person.CityId = newCity.Id;
+                    return BadRequest($"Grupo de pessoas {groupId} não encontrada");
                 }
+            }
+
+
+            var existingCity = await _context.Cities
+                    .FindAsync(request.CityId);
+
+            if (existingCity != null)
+            {
+                person.City = existingCity;
+                person.CityId = existingCity.Id;
             }
             else
             {
-                return BadRequest("Cidade deve ser informada.");
+                return BadRequest($"Cidade {request.CityId} não encontrada");
             }
 
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PersonExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _context.SaveChangesAsync();
+            
             return Ok(person);
         }
 

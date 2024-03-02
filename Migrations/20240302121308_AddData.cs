@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class first : Migration
+    public partial class AddData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -112,40 +112,18 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Person",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Phone = table.Column<string>(type: "text", nullable: false),
-                    Age = table.Column<int>(type: "integer", nullable: false),
-                    CPF = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    BirthDate = table.Column<string>(type: "text", nullable: true),
-                    IBGE = table.Column<string>(type: "text", nullable: true),
-                    Razao = table.Column<string>(type: "text", nullable: true),
-                    InscricaoEstadual = table.Column<string>(type: "text", nullable: true),
-                    CEP = table.Column<string>(type: "text", nullable: false),
-                    UrlImage = table.Column<string>(type: "text", nullable: true),
-                    IsBlocked = table.Column<bool>(type: "boolean", nullable: true),
-                    MaritalStatus = table.Column<string>(type: "text", nullable: true),
-                    Habilities = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CityId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: false),
-                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    PersonId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Person", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Person_Cities_CityId",
-                        column: x => x.CityId,
-                        principalTable: "Cities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -155,12 +133,24 @@ namespace HefestusApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    MinPriceSale = table.Column<float>(type: "real", nullable: false),
+                    AverageCost = table.Column<decimal>(type: "numeric", nullable: false),
+                    PromotionalPrice = table.Column<float>(type: "real", nullable: false),
                     PriceSale = table.Column<float>(type: "real", nullable: false),
-                    PriceTotal = table.Column<float>(type: "real", nullable: false),
+                    BruteCost = table.Column<float>(type: "real", nullable: false),
+                    LiquidCost = table.Column<float>(type: "real", nullable: false),
+                    WholesalePrice = table.Column<float>(type: "real", nullable: false),
+                    MinWholesalePrice = table.Column<float>(type: "real", nullable: false),
+                    UrlImage = table.Column<string>(type: "text", nullable: true),
+                    NCM = table.Column<int>(type: "integer", nullable: false),
+                    GTIN = table.Column<string>(type: "text", nullable: false),
+                    GTINtrib = table.Column<string>(type: "text", nullable: true),
                     FamilyId = table.Column<int>(type: "integer", nullable: false),
                     GroupId = table.Column<int>(type: "integer", nullable: false),
-                    SubgroupId = table.Column<int>(type: "integer", nullable: false)
+                    SubgroupId = table.Column<int>(type: "integer", nullable: false),
+                    Reference = table.Column<string>(type: "text", nullable: true),
+                    Batch = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -183,6 +173,52 @@ namespace HefestusApi.Migrations
                         principalTable: "ProductSubGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Person",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: false),
+                    Age = table.Column<int>(type: "integer", nullable: false),
+                    CPF = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    BirthDate = table.Column<string>(type: "text", nullable: true),
+                    IBGE = table.Column<string>(type: "text", nullable: true),
+                    Razao = table.Column<string>(type: "text", nullable: true),
+                    InscricaoEstadual = table.Column<string>(type: "text", nullable: true),
+                    CEP = table.Column<string>(type: "text", nullable: false),
+                    UrlImage = table.Column<string>(type: "text", nullable: true),
+                    IsBlocked = table.Column<bool>(type: "boolean", nullable: true),
+                    MaritalStatus = table.Column<string>(type: "text", nullable: true),
+                    Habilities = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<string>(type: "text", nullable: true),
+                    ICMSContributor = table.Column<bool>(type: "boolean", nullable: true),
+                    PersonType = table.Column<string>(type: "text", nullable: false),
+                    CityId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<string>(type: "text", nullable: false),
+                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Person", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Person_Cities_CityId",
+                        column: x => x.CityId,
+                        principalTable: "Cities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Person_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -251,27 +287,6 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    PersonId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Person_PersonId",
-                        column: x => x.PersonId,
-                        principalTable: "Person",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderProduct",
                 columns: table => new
                 {
@@ -295,6 +310,11 @@ namespace HefestusApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cities_Name",
+                table: "Cities",
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_ClientId",
@@ -327,6 +347,22 @@ namespace HefestusApi.Migrations
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Person_UserId",
+                table: "Person",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Persons_Name",
+                table: "Person",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonGroups_Name",
+                table: "PersonGroup",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PersonPersonGroup_PersonsId",
                 table: "PersonPersonGroup",
                 column: "PersonsId");
@@ -347,10 +383,24 @@ namespace HefestusApi.Migrations
                 column: "SubgroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_PersonId",
-                table: "Users",
-                column: "PersonId",
-                unique: true);
+                name: "IX_Products_Name",
+                table: "Product",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductFamilies_Name",
+                table: "ProductFamily",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductGroups_Name",
+                table: "ProductGroups",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductSubGroups_Name",
+                table: "ProductSubGroup",
+                column: "Name");
         }
 
         /// <inheritdoc />
@@ -361,9 +411,6 @@ namespace HefestusApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "PersonPersonGroup");
-
-            migrationBuilder.DropTable(
-                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Order");
@@ -394,6 +441,9 @@ namespace HefestusApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

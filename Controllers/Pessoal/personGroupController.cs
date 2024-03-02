@@ -42,7 +42,7 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PersonGroup>>> GetPersonGroupBySearch(string searchTerm)
+        public async Task<ActionResult<IEnumerable<PersonGroupSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -59,7 +59,7 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpPost]
-        public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupDto request)
+        public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupPostOrPutDto request)
         {
             var existingPersonGroup = await _context.PersonGroup.FirstOrDefaultAsync(p => p.Name == request.Name);
 
@@ -82,7 +82,7 @@ namespace HefestusApi.Controllers.PESSOAL
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PersonGroup>> UpdatePersonGroup(int id, PersonGroupDto request)
+        public async Task<ActionResult<PersonGroup>> UpdatePersonGroup(int id, PersonGroupPostOrPutDto request)
         {
             var personGroup = await _context.PersonGroup.FindAsync(id);
 

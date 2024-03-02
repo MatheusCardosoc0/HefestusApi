@@ -54,7 +54,7 @@ namespace HefestusApi.Controllers.Produtos
         }
 
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct(ProductDto request)
+        public async Task<ActionResult<Product>> CreateProduct(ProductPostOrPutDto request)
         {
             var newProduct = new Product
             {
@@ -82,76 +82,48 @@ namespace HefestusApi.Controllers.Produtos
                 Subgroup = new ProductSubGroup(),
             };
 
-            if (request.Group != null)
-            {
-                var existingGroup = await _context.ProductGroups
-                    .FirstOrDefaultAsync(pg => pg.Name == request.Group.Name);
 
-                if (existingGroup != null)
-                {
-                    newProduct.Group = existingGroup;
-                    newProduct.GroupId = existingGroup.Id; 
-                }
-                else
-                {
-                    var newGroup = new ProductGroup { Name = request.Group.Name };
-                    _context.ProductGroups.Add(newGroup);
-                    await _context.SaveChangesAsync();
-                    newProduct.Group = newGroup;
-                    newProduct.GroupId = newGroup.Id;
-                }
-            }else
-            {
-                return BadRequest("É necessário informar um grupo");
-            }
+            var existingProductGroup = await _context.ProductGroups
+                    .FindAsync(request.GroupId);
 
-            if (request.Family != null)
+            if (existingProductGroup != null)
             {
-                var existingFamily = await _context.ProductFamily
-                    .FirstOrDefaultAsync(pf => pf.Name == request.Family.Name);
-
-                if (existingFamily != null)
-                {
-                    newProduct.Family = existingFamily;
-                    newProduct.FamilyId = existingFamily.Id; 
-                }
-                else
-                {
-                    var newFamily = new ProductFamily { Name = request.Family.Name };
-                    _context.ProductFamily.Add(newFamily);
-                    await _context.SaveChangesAsync();
-                    newProduct.Family = newFamily;
-                    newProduct.FamilyId = newFamily.Id;
-                }
+                newProduct.Group = existingProductGroup;
+                newProduct.GroupId = existingProductGroup.Id;
             }
             else
             {
-                return BadRequest("É necessário informar uma familia");
+                return BadRequest($"Grupo de produtos {request.GroupId} não encontrada");
             }
 
-            if (request.Subgroup != null)
-            {
-                var existingSubgroup = await _context.ProductSubGroup
-                    .FirstOrDefaultAsync(psg => psg.Name == request.Subgroup.Name);
 
-                if (existingSubgroup != null)
-                {
-                    newProduct.Subgroup = existingSubgroup;
-                    newProduct.SubgroupId = existingSubgroup.Id; 
-                }
-                else
-                {
-                    var newSubgroup = new ProductSubGroup { Name = request.Subgroup.Name };
-                    _context.ProductSubGroup.Add(newSubgroup);
-                    await _context.SaveChangesAsync();
-                    newProduct.Subgroup = newSubgroup;
-                    newProduct.SubgroupId = newSubgroup.Id;
-                }
+            var existingProductFamily = await _context.ProductFamily
+                   .FindAsync(request.FamilyId);
+
+            if (existingProductFamily != null)
+            {
+                newProduct.Family = existingProductFamily;
+                newProduct.FamilyId = existingProductFamily.Id;
             }
             else
             {
-                return BadRequest("É necessário informar um subgrupo");
+                return BadRequest($"Familia de produtos {request.FamilyId} não encontrada");
             }
+
+
+            var existingProductSubGroup = await _context.ProductSubGroup
+                   .FindAsync(request.SubGroupId);
+
+            if (existingProductSubGroup != null)
+            {
+                newProduct.Subgroup = existingProductSubGroup;
+                newProduct.SubgroupId = existingProductSubGroup.Id;
+            }
+            else
+            {
+                return BadRequest($"Sub Grupo de produtos {request.SubGroupId} não encontrada");
+            }
+
 
             _context.Product.Add(newProduct);
             await _context.SaveChangesAsync();
@@ -160,7 +132,7 @@ namespace HefestusApi.Controllers.Produtos
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> UpdateProduct(int id, ProductDto request)
+        public async Task<ActionResult<Product>> UpdateProduct(int id, ProductPostOrPutDto request)
         {
             var product = await _context.Product
                 .Include(c => c.Group)
@@ -193,76 +165,45 @@ namespace HefestusApi.Controllers.Produtos
                 product.WholesalePrice = request.WholesalePrice;
                 product.MinPriceSale = request.MinPriceSale;
 
-            if (request.Group != null)
-            {
-                var existingGroup = await _context.ProductGroups
-                    .FirstOrDefaultAsync(pg => pg.Name == request.Group.Name);
+            var existingProductGroup = await _context.ProductGroups
+                    .FindAsync(request.GroupId);
 
-                if (existingGroup != null)
-                {
-                    product.Group = existingGroup;
-                    product.GroupId = existingGroup.Id;
-                }
-                else
-                {
-                    var newGroup = new ProductGroup { Name = request.Group.Name };
-                    _context.ProductGroups.Add(newGroup);
-                    await _context.SaveChangesAsync();
-                    product.Group = newGroup;
-                    product.GroupId = newGroup.Id;
-                }
+            if (existingProductGroup != null)
+            {
+                product.Group = existingProductGroup;
+                product.GroupId = existingProductGroup.Id;
             }
             else
             {
-                return BadRequest("É necessário informar um grupo");
+                return BadRequest($"Grupo de produtos {request.GroupId} não encontrada");
             }
 
-            if (request.Family != null)
-            {
-                var existingFamily = await _context.ProductFamily
-                    .FirstOrDefaultAsync(pf => pf.Name == request.Family.Name);
 
-                if (existingFamily != null)
-                {
-                    product.Family = existingFamily;
-                    product.FamilyId = existingFamily.Id;
-                }
-                else
-                {
-                    var newFamily = new ProductFamily { Name = request.Family.Name };
-                    _context.ProductFamily.Add(newFamily);
-                    await _context.SaveChangesAsync();
-                    product.Family = newFamily;
-                    product.FamilyId = newFamily.Id;
-                }
+            var existingProductFamily = await _context.ProductFamily
+                   .FindAsync(request.FamilyId);
+
+            if (existingProductFamily != null)
+            {
+                product.Family = existingProductFamily;
+                product.FamilyId = existingProductFamily.Id;
             }
             else
             {
-                return BadRequest("É necessário informar uma familia");
+                return BadRequest($"Familia de produtos {request.FamilyId} não encontrada");
             }
 
-            if (request.Subgroup != null)
-            {
-                var existingSubgroup = await _context.ProductSubGroup
-                    .FirstOrDefaultAsync(psg => psg.Name == request.Subgroup.Name);
 
-                if (existingSubgroup != null)
-                {
-                    product.Subgroup = existingSubgroup;
-                    product.SubgroupId = existingSubgroup.Id;
-                }
-                else
-                {
-                    var newSubgroup = new ProductSubGroup { Name = request.Subgroup.Name };
-                    _context.ProductSubGroup.Add(newSubgroup);
-                    await _context.SaveChangesAsync();
-                    product.Subgroup = newSubgroup;
-                    product.SubgroupId = newSubgroup.Id;
-                }
+            var existingProductSubGroup = await _context.ProductSubGroup
+                   .FindAsync(request.SubGroupId);
+
+            if (existingProductSubGroup != null)
+            {
+                product.Subgroup = existingProductSubGroup;
+                product.SubgroupId = existingProductSubGroup.Id;
             }
             else
             {
-                return BadRequest("É necessário informar um subgrupo");
+                return BadRequest($"Sub Grupo de produtos {request.SubGroupId} não encontrada");
             }
 
             await _context.SaveChangesAsync();
@@ -295,7 +236,7 @@ namespace HefestusApi.Controllers.Produtos
         }
 
         [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductSearch(string searchTerm)
+        public async Task<ActionResult<IEnumerable<ProductSearchTermDto>>> GetProductSearch(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -306,9 +247,6 @@ namespace HefestusApi.Controllers.Produtos
 
             var product = await _context.Product
                 .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .Include(p => p.Subgroup)
-                .Include(p => p.Family)
-                .Include(p => p.Group)
                 .ToListAsync();
 
             return Ok(product);

@@ -141,12 +141,18 @@ namespace HefestusApi.Migrations
                     b.Property<string>("UrlImage")
                         .HasColumnType("text");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_Persons_Name");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Person");
                 });
@@ -200,9 +206,6 @@ namespace HefestusApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId")
-                        .IsUnique();
-
                     b.ToTable("Users");
                 });
 
@@ -226,6 +229,9 @@ namespace HefestusApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_PaymentConditions_Name");
+
                     b.ToTable("PaymentCondition");
                 });
 
@@ -245,6 +251,9 @@ namespace HefestusApi.Migrations
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_PaymentOptions_Name");
 
                     b.ToTable("PaymentOptions");
                 });
@@ -469,18 +478,13 @@ namespace HefestusApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HefestusApi.Models.Administracao.User", "User")
+                        .WithOne("Person")
+                        .HasForeignKey("HefestusApi.Models.Administracao.Person", "UserId");
+
                     b.Navigation("City");
-                });
 
-            modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
-                {
-                    b.HasOne("HefestusApi.Models.Administracao.Person", "Person")
-                        .WithOne("User")
-                        .HasForeignKey("HefestusApi.Models.Administracao.User", "PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Produtos.Product", b =>
@@ -587,8 +591,11 @@ namespace HefestusApi.Migrations
             modelBuilder.Entity("HefestusApi.Models.Administracao.Person", b =>
                 {
                     b.Navigation("Orders");
+                });
 
-                    b.Navigation("User")
+            modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
+                {
+                    b.Navigation("Person")
                         .IsRequired();
                 });
 

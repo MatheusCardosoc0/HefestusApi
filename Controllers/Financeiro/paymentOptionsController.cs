@@ -37,12 +37,12 @@ namespace HefestusApi.Controllers.Financeiro
         }
 
         [HttpPost]
-        public async Task<ActionResult<PaymentOptions>> PostPaymentOptions(PaymentOptionsDto request)
+        public async Task<ActionResult<PaymentOptions>> PostPaymentOptions(PaymentOptionsPostOrPutDto request)
         {
             var newPaymentOption = new PaymentOptions
             {
                 Name = request.Name,
-                isUseCreditLimit = request.isUseCreditLimit
+                isUseCreditLimit = request.IsUseCreditLimit
             };
 
             _context.PaymentOptions.Add(newPaymentOption);
@@ -51,7 +51,7 @@ namespace HefestusApi.Controllers.Financeiro
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PaymentOptions>> PutPaymentOptions(int id, PaymentOptionsDto request)
+        public async Task<ActionResult<PaymentOptions>> PutPaymentOptions(int id, PaymentOptionsPostOrPutDto request)
         {
             var PaymentOption = await _context.PaymentOptions.FirstOrDefaultAsync(c => c.Id == id);
 
@@ -61,7 +61,7 @@ namespace HefestusApi.Controllers.Financeiro
             }
 
             PaymentOption.Name = request.Name;
-            PaymentOption.isUseCreditLimit = request.isUseCreditLimit;
+            PaymentOption.isUseCreditLimit = request.IsUseCreditLimit;
             try
             {
                 await _context.SaveChangesAsync();
@@ -75,7 +75,7 @@ namespace HefestusApi.Controllers.Financeiro
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PaymentOptions>> DeletePaymentOption(int id)
+        public async Task<ActionResult<PaymentOptionsDto>> DeletePaymentOption(int id)
         {
             var PaymentOption = await _context.PaymentOptions.FirstOrDefaultAsync(c => c.Id == id);
 
@@ -96,6 +96,23 @@ namespace HefestusApi.Controllers.Financeiro
             }
 
             return NoContent();
+        }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<PaymentOptionsSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var paymentOptions = await _context.PaymentOptions
+                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(paymentOptions);
         }
     }
 }

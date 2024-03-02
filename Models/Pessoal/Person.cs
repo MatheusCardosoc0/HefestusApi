@@ -31,8 +31,9 @@ namespace HefestusApi.Models.Administracao
         public int CityId { get; set; }
         public City City { get; set; }
         public List<PersonGroup> PersonGroup { get; set; }
+        public int? UserId { get; set; }
         [JsonIgnore]
-        public User User { get; set; }
+        public User? User { get; set; }
         [JsonIgnore]
         public List<Order> Orders { get; set; }
     }

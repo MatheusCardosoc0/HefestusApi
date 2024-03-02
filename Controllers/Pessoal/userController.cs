@@ -47,17 +47,17 @@ namespace HefestusApi.Controllers.Administracao
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(UserDto request)
         {
-            var existingPerson = await _context.Person.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == request.Person.Id);
+            var existingPerson = await _context.Person.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == request.PersonId);
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
 
             if (existingPerson == null)
             {
-                return NotFound($"Person não encontrada com o ID {request.Person.Id}");
+                return NotFound($"Person não encontrada com o ID {request.PersonId}");
             }
 
             if (existingPerson.User != null)
             {
-                return BadRequest($"Person com ID {request.Person.Id} já tem um User associado.");
+                return BadRequest($"Person com ID {request.PersonId} já tem um User associado.");
             }
 
             if(existingUser != null)
@@ -100,22 +100,20 @@ namespace HefestusApi.Controllers.Administracao
                 user.Password = hashedPassword;
             }
 
-            //user.Name = user.Name;
-
-            if (request.Person.Id != 0)
+            if (request.PersonId != null)
             {
                 var person = await _context.Person
                     .Include(p => p.User)
-                    .FirstOrDefaultAsync(p => p.Id == request.Person.Id);
+                    .FirstOrDefaultAsync(p => p.Id == request.PersonId);
                     
                    
                 if (person == null)
                 {
-                    return NotFound($"Person com o ID {request.Person.Id} não encontrado");
+                    return NotFound($"Person com o ID {request.PersonId} não encontrado");
                 }
-                if(person.User.Id != user.Id)
+                if(person.UserId != user.Id)
                 {
-                    return BadRequest($"Pessoa com o id {request.Person.Id} já possui outro usuário relacionado");
+                    return BadRequest($"Pessoa com o id {request.PersonId} já possui outro usuário relacionado");
                 }
 
                 user.Person = person;

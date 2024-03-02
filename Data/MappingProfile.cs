@@ -33,7 +33,8 @@ namespace HefestusApi.Data
 
             CreateMap<Person, PersonDto>()
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.City.State))
-                .ForMember(dest => dest.MainPersonGroup, opt => opt.MapFrom(src => src.PersonGroup[0].Name));
+                .ForMember(dest => dest.MainPersonGroup, opt => opt.MapFrom(src => src.PersonGroup[0].Name))
+                .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name));
             CreateMap<PersonGroup, PersonGroupDto>();
             CreateMap<City, CityDto>();
         }

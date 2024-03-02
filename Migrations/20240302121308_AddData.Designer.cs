@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240213111615_AddMoreAtributesInPerson")]
-    partial class AddMoreAtributesInPerson
+    [Migration("20240302121308_AddData")]
+    partial class AddData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,9 @@ namespace HefestusApi.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Cities_Name");
 
                     b.ToTable("Cities");
                 });
@@ -141,9 +144,18 @@ namespace HefestusApi.Migrations
                     b.Property<string>("UrlImage")
                         .HasColumnType("text");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Persons_Name");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Person");
                 });
@@ -170,6 +182,9 @@ namespace HefestusApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_PersonGroups_Name");
+
                     b.ToTable("PersonGroup");
                 });
 
@@ -193,9 +208,6 @@ namespace HefestusApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PersonId")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -251,15 +263,42 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AverageCost")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Batch")
+                        .HasColumnType("text");
+
+                    b.Property<float>("BruteCost")
+                        .HasColumnType("real");
+
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<int>("FamilyId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("GTIN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GTINtrib")
+                        .HasColumnType("text");
+
                     b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("LiquidCost")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MinPriceSale")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MinWholesalePrice")
+                        .HasColumnType("real");
+
+                    b.Property<int>("NCM")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -270,17 +309,29 @@ namespace HefestusApi.Migrations
                     b.Property<float>("PriceSale")
                         .HasColumnType("real");
 
-                    b.Property<float>("PriceTotal")
+                    b.Property<float>("PromotionalPrice")
                         .HasColumnType("real");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("text");
 
                     b.Property<int>("SubgroupId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UrlImage")
+                        .HasColumnType("text");
+
+                    b.Property<float>("WholesalePrice")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FamilyId");
 
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Products_Name");
 
                     b.HasIndex("SubgroupId");
 
@@ -301,6 +352,9 @@ namespace HefestusApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_ProductFamilies_Name");
+
                     b.ToTable("ProductFamily");
                 });
 
@@ -318,6 +372,9 @@ namespace HefestusApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_ProductGroups_Name");
+
                     b.ToTable("ProductGroups");
                 });
 
@@ -334,6 +391,9 @@ namespace HefestusApi.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_ProductSubGroups_Name");
 
                     b.ToTable("ProductSubGroup");
                 });
@@ -415,18 +475,13 @@ namespace HefestusApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HefestusApi.Models.Administracao.User", "User")
+                        .WithOne("Person")
+                        .HasForeignKey("HefestusApi.Models.Administracao.Person", "UserId");
+
                     b.Navigation("City");
-                });
 
-            modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
-                {
-                    b.HasOne("HefestusApi.Models.Administracao.Person", "Person")
-                        .WithOne("User")
-                        .HasForeignKey("HefestusApi.Models.Administracao.User", "PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Produtos.Product", b =>
@@ -533,8 +588,11 @@ namespace HefestusApi.Migrations
             modelBuilder.Entity("HefestusApi.Models.Administracao.Person", b =>
                 {
                     b.Navigation("Orders");
+                });
 
-                    b.Navigation("User")
+            modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
+                {
+                    b.Navigation("Person")
                         .IsRequired();
                 });
 

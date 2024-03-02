@@ -1,5 +1,6 @@
 ﻿using HefestusApi.DTOs.Financeiro;
 using HefestusApi.Models.Financeiro;
+using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ namespace HefestusApi.Controllers.Financeiro
         }
 
         [HttpPost]
-        public async Task<ActionResult<PaymentCondition>> PostPaymentCondition(PaymentConditionDto request)
+        public async Task<ActionResult<PaymentCondition>> PostPaymentCondition(PaymentConditionPostOrPutDto request)
         {
             var newPaymentCondition = new PaymentCondition
             {
@@ -53,7 +54,7 @@ namespace HefestusApi.Controllers.Financeiro
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PaymentCondition>> PutPaymentCondition(int id, PaymentConditionDto request)
+        public async Task<ActionResult<PaymentCondition>> PutPaymentCondition(int id, PaymentConditionPostOrPutDto request)
         {
             var PaymentCondition = await _context.PaymentCondition.FirstOrDefaultAsync(c => c.Id == id);
 
@@ -100,6 +101,24 @@ namespace HefestusApi.Controllers.Financeiro
             }
 
             return NoContent();
+        }
+
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<PaymentConditionSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Não foi informado um termo de pesquisa");
+            }
+
+            var lowerCaseSearchTerm = searchTerm.ToLower();
+
+            var paymentConditions = await _context.PaymentCondition
+                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .ToListAsync();
+
+            return Ok(paymentConditions);
         }
     }
 }

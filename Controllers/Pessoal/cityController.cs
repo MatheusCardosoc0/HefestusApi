@@ -40,7 +40,7 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(city);
         }
         [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<City>>> GetCityBySearch(string searchTerm)
+        public async Task<ActionResult<IEnumerable<CitySearchTermDto>>> GetCityBySearch(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -51,13 +51,14 @@ namespace HefestusApi.Controllers.Administracao
 
             var cities = await _context.Cities
                 .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                .Select(c => new CitySearchTermDto { Id = c.Id, Name = c.Name})
                 .ToListAsync();
 
             return Ok(cities);
         }
 
         [HttpPost]
-        public async Task<ActionResult<City>> CreateCity(CityDto request)
+        public async Task<ActionResult<City>> CreateCity(CityPostOrPutDto request)
         {
             var checkCity = await _context.Cities
                 .FirstOrDefaultAsync(c => c.IBGENumber == request.IBGENumber);
@@ -81,7 +82,7 @@ namespace HefestusApi.Controllers.Administracao
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<City>> UpdateCity(int id, CityDto request)
+        public async Task<ActionResult<City>> UpdateCity(int id, CityPostOrPutDto request)
         {
             var city = await _context.Cities.FindAsync(id);
 
