@@ -4,6 +4,7 @@ using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace EntityFramework7Relationships.Controllers
 {
@@ -32,8 +33,8 @@ namespace EntityFramework7Relationships.Controllers
             return Ok(personDtos);
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PersonSearchTermDto>>> GetPersonsBySearchTerm(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult> GetPersonsBySearchTerm(string searchTerm, string detailLevel)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -42,16 +43,35 @@ namespace EntityFramework7Relationships.Controllers
 
             var lowerCaseSearchTerm = searchTerm.ToLower();
 
-            var persons = await _context.Person
-                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .Select(p => new PersonSearchTermDto { Id = p.Id, Name = p.Name})
-                .ToListAsync();
+            if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
+            {
+                var persons = await _context.Person
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .Select(p => new PersonSearchTermDto(p.Id, p.Name))
+                    .ToListAsync();
 
-            return Ok(persons);
+                return Ok(persons);
+            }
+            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
+            {
+                var personsComplete = await _context.Person
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .Include(c => c.PersonGroup)
+                    .Include(c => c.City)
+                    .ToListAsync();
+
+                var dto = _mapper.Map<IEnumerable<PersonPostOrPutDto>>(personsComplete);
+
+                return Ok(dto);
+            }
+            else
+            {
+                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Person>> GetPersonById(int id)
+        public async Task<ActionResult<PersonPostOrPutDto>> GetPersonById(int id)
         {
             var person = await _context.Person
                 .Include(c => c.PersonGroup)
@@ -63,7 +83,9 @@ namespace EntityFramework7Relationships.Controllers
                 return NotFound($"Pessoa com o ID {id} não existe");
             }
 
-            return Ok(person);
+            var dto = _mapper.Map<PersonPostOrPutDto>(person);
+
+            return Ok(dto);
         }
 
         [HttpPost]
@@ -77,16 +99,16 @@ namespace EntityFramework7Relationships.Controllers
             {
                 return BadRequest("Dados do pedido inválidos ou incompletos.");
             }
-            if(request.PersonGroupIds == null) 
+            if(request.PersonGroup == null) 
             {
                 return BadRequest("Grupo deve ser informada.");
             }
-            if (request.CityId == null)
+            if (request.City == null)
             {
                 return BadRequest("Cidade deve ser informada.");
             }
 
-            if (request.PersonGroupIds == null || !request.PersonGroupIds.Any())
+            if (request.PersonGroup == null || !request.PersonGroup.Any())
             {
                 return BadRequest("Pelo menos um Grupo deve ser informado.");
             }
@@ -116,36 +138,34 @@ namespace EntityFramework7Relationships.Controllers
              };
 
            
-                foreach (var groupId in request.PersonGroupIds)
+            foreach (var group in request.PersonGroup)
+            {
+                var existingGroup = await _context.PersonGroup
+                    .FindAsync(group.Id);
+
+                if (existingGroup != null)
                 {
-                    var existingGroup = await _context.PersonGroup
-                        .FindAsync(groupId);
-
-                    if (existingGroup != null)
-                    {
-                        newPerson.PersonGroup.Add(existingGroup);
-                    }
-                    else
-                    {
-                        return BadRequest($"Grupo de pessoas {groupId} não encontrada");
-                    }
-                }
-
-
-            
-                var existingCity = await _context.Cities
-                    .FindAsync(request.CityId);
-
-                if (existingCity != null)
-                {
-                    newPerson.City = existingCity;
-                    newPerson.CityId = existingCity.Id;
+                    newPerson.PersonGroup.Add(existingGroup);
                 }
                 else
                 {
-                    return BadRequest($"Cidade {request.CityId} não encontrada");
+                    return BadRequest($"Grupo de pessoas {group.Id} não encontrada");
                 }
+            }
+
             
+            var existingCity = await _context.Cities
+                .FindAsync(request.City.Id);
+
+            if (existingCity != null)
+            {
+                newPerson.City = existingCity;
+                newPerson.CityId = existingCity.Id;
+            }
+            else
+            {
+                return BadRequest($"Cidade {request.City.Id} não encontrada");
+            }
             
 
             _context.Person.Add(newPerson);
@@ -189,10 +209,10 @@ namespace EntityFramework7Relationships.Controllers
 
             person.PersonGroup.Clear();
 
-            foreach (var groupId in request.PersonGroupIds)
+            foreach (var group in request.PersonGroup)
             {
                 var existingGroup = await _context.PersonGroup
-                    .FindAsync(groupId);
+                    .FindAsync(group.Id);
 
                 if (existingGroup != null)
                 {
@@ -200,13 +220,13 @@ namespace EntityFramework7Relationships.Controllers
                 }
                 else
                 {
-                    return BadRequest($"Grupo de pessoas {groupId} não encontrada");
+                    return BadRequest($"Grupo de pessoas {group.Id} não encontrada");
                 }
             }
 
 
             var existingCity = await _context.Cities
-                    .FindAsync(request.CityId);
+                    .FindAsync(request.City.Id);
 
             if (existingCity != null)
             {
@@ -215,7 +235,7 @@ namespace EntityFramework7Relationships.Controllers
             }
             else
             {
-                return BadRequest($"Cidade {request.CityId} não encontrada");
+                return BadRequest($"Cidade {request.City.Id} não encontrada");
             }
 
             await _context.SaveChangesAsync();
@@ -253,10 +273,7 @@ namespace EntityFramework7Relationships.Controllers
             return NoContent();
         }
 
-        private bool PersonExists(int id)
-        {
-            return _context.Person.Any(e => e.Id == id);
-        }
+       
 
     }
 }

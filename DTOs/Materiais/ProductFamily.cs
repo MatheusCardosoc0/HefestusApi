@@ -4,5 +4,10 @@
         int Id,
         string Name
         );
+
+    public record struct ProductFamilySearchTermDto(
+        int Id,
+        string Name
+        );
 }
 

@@ -32,6 +32,7 @@ namespace HefestusApi.Controllers.Vendas
                   .ThenInclude(op => op.Product)
                 .Include(o => o.PaymentOption)
                 .Include(o => o.PaymentCondition)
+                .Include(o => o.OrderInstallments)
                 .ToListAsync();
 
             var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
@@ -63,7 +64,8 @@ namespace HefestusApi.Controllers.Vendas
                     TypeOrder = request.TypeOrder,
                     CostOfFreight = request.CostOfFreight ?? 0,
                     TypeFreight = request.TypeFreight,
-                    OrderProducts = new List<OrderProduct>()
+                    OrderProducts = new List<OrderProduct>(),
+                    OrderInstallments = new List<OrderInstallment>()
                 };
 
                 _context.Order.Add(newOrder);
@@ -89,12 +91,30 @@ namespace HefestusApi.Controllers.Vendas
                     _context.OrderProduct.Add(orderProduct);
                 }
 
+                foreach (var orderInstallmentDto in request.OrderInstallments)
+                {
+                    var paymentCondition = await _context.PaymentCondition.FindAsync(orderInstallmentDto.PaymentOptionId);
+                    if (paymentCondition == null)
+                    {
+                        return BadRequest($"Metodo de pagamento com ID {orderInstallmentDto.PaymentOptionId} não encontrado.");
+                    }
+
+                    var orderProduct = new OrderInstallment
+                    {
+                        OrderId = newOrder.Id,
+                        InstallmentNumber = orderInstallmentDto.InstallmentNumber,
+                        PaymentOptionId = paymentCondition.Id,
+                        Maturity = orderInstallmentDto.Maturity,
+                        Value = orderInstallmentDto.Value,
+                    };
+
+                    _context.OrderInstallment.Add(orderProduct);
+                }
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return Ok(newOrder);
-            
-           
         }
 
     }

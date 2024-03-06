@@ -4,4 +4,9 @@
         int Id,
         string Name
         );
+
+    public record struct ProductSubGroupSearchTermDto(
+        int Id,
+        string Name
+        );
 }

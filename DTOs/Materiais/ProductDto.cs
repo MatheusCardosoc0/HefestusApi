@@ -43,9 +43,9 @@
         int NCM,
         string GTIN,
         string? GTINtrib,
-        int FamilyId,
-        int GroupId,
-        int SubGroupId,
+        ProductFamilySearchTermDto ProductFamily,
+        ProductGroupSearchTermDto ProductGroup,
+        ProductSubGroupSearchTermDto ProductSubGroup,
         string? Reference,
         string? Batch,
         string UnitOfMensuration
@@ -53,7 +53,9 @@
 
     public record struct ProductSearchTermDto (
         int Id,
-        string Name
+        string Name,
+        float PriceSale,
+        float WholesalePrice
     );
 }
 

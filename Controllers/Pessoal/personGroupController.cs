@@ -1,4 +1,5 @@
 ﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -41,8 +42,8 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(personGroup);
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PersonGroupSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<PersonGroupSearchTermDto>>> GetPersonGroupBySearch(string searchTerm, string detailLevel)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -51,11 +52,26 @@ namespace HefestusApi.Controllers.PESSOAL
 
             var lowerCaseSearchTerm = searchTerm.ToLower();
 
-            var personGroups = await _context.PersonGroup
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
+            if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
+            {
+                var personGroups = await _context.PersonGroup
+                    .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .ToListAsync();
 
-            return Ok(personGroups);
+                return Ok(personGroups);
+            }
+            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
+            {
+                var personGroupComplete = await _context.PersonGroup
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .ToListAsync();
+
+                return Ok(personGroupComplete);
+            }
+            else
+            {
+                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
+            }
         }
 
         [HttpPost]

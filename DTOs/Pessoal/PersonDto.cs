@@ -1,4 +1,6 @@
-﻿namespace HefestusApi.DTOs.Administracao
+﻿using HefestusApi.DTOs.Produtos;
+
+namespace HefestusApi.DTOs.Administracao
 {
 public record struct PersonDto(
         int Id,
@@ -28,6 +30,7 @@ public record struct PersonDto(
         );
 
     public record struct PersonPostOrPutDto(
+        int Id,
         string Name,
         string Email,
         string Phone,
@@ -44,8 +47,8 @@ public record struct PersonDto(
         string? MaritalStatus,
         string? Habilities,
         string? Description,
-        List<int> PersonGroupIds,
-        int CityId,
+        List<PersonGroupSearchTermDto> PersonGroup,
+        CitySearchTermDto City,
         string? Gender,
         bool? ICMSContributor,
         string PersonType

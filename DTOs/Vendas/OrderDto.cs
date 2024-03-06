@@ -1,4 +1,5 @@
 ﻿using HefestusApi.DTOs.Produtos;
+using HefestusApi.Models.Financeiro;
 
 namespace HefestusApi.DTOs.Vendas
 {
@@ -9,6 +10,7 @@ namespace HefestusApi.DTOs.Vendas
         int ResponsibleId,
         string ResponsibleName,
         List<OrderProductDto> OrderProducts,
+        List<OrderInstallmentDto> OrderInstallments,
         int PaymentConditionId,
         string PaymentConditionName,
         int PaymentOptionId,
@@ -25,10 +27,10 @@ namespace HefestusApi.DTOs.Vendas
         );
 
     public record struct OrderPostOrPutDto(
-        int Id,
         int ClientId,
         int ResponsibleId,
         List<OrderProductPostOrPutDto> OrderProducts,
+        List<OrderInstallmentPostOrPutDto> OrderInstallments,
         int PaymentConditionId,
         int PaymentOptionId,
         int? InvoiceId,
@@ -40,6 +42,25 @@ namespace HefestusApi.DTOs.Vendas
         float? CostOfFreight,
         string? TypeFreight
         );
+
+    public record struct OrderInstallmentDto(
+        int OrderId,
+        int InstallmentNumber, 
+        int PaymentOptionId, 
+        string PaymentOptionName, 
+        string Maturity, 
+        decimal Value,
+        string ClientName,
+        string DateOfCompletion
+        );
+
+    public record struct OrderInstallmentPostOrPutDto(
+       int OrderId,
+       int InstallmentNumber,
+       int PaymentOptionId,
+       string Maturity,
+       decimal Value
+       );
 
     public record struct OrderProductDto(
          int OrderId,

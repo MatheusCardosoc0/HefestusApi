@@ -25,6 +25,8 @@ namespace HefestusApi.Utils
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderProduct> OrderProduct { get; set; }
 
+        public DbSet<OrderInstallment> OrderInstallment { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -106,6 +108,14 @@ namespace HefestusApi.Utils
 
             modelBuilder.Entity<OrderProduct>()
                 .HasKey(op => new { op.Id });
+
+            modelBuilder.Entity<OrderInstallment>()
+                .HasKey(op => new { op.OrderId, op.InstallmentNumber });
+
+            modelBuilder.Entity<OrderInstallment>()
+               .HasOne(op => op.Order)
+               .WithMany(o => o.OrderInstallments)
+               .HasForeignKey(op => op.OrderId);
 
             modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Order)

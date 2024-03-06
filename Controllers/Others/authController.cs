@@ -32,7 +32,7 @@ namespace HefestusApi.Controllers.Others
                 .FirstOrDefaultAsync(u => u.Name == userCredentials.Username);
 
             if (user == null)
-                return BadRequest(new {message = "Usuário não encontrado" });
+                return BadRequest("Usuário não encontrado");
 
             bool validPassword = BCrypt.Net.BCrypt.Verify(userCredentials.Password, user.Password);
             if (!validPassword)
@@ -46,7 +46,7 @@ namespace HefestusApi.Controllers.Others
         [HttpGet("{token}")]
         public ActionResult ValidateToken(string token)
         {
-            if (string.IsNullOrEmpty(token)) return Unauthorized(new {message = "Token invalido" });
+            if (string.IsNullOrEmpty(token)) return Unauthorized("Token invalido");
 
             var userName = _tokenGenerator.ValidateToken(token);
 

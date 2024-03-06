@@ -71,6 +71,8 @@ namespace HefestusApi.Models.Vendas
         [StringLength(100, ErrorMessage = "O tipo de ordem deve ter no máximo 100 caracteres.")]
         public string TypeOrder { get; set; }
 
+        public List<OrderInstallment> OrderInstallments { get; set; }
+
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "O custo do frete deve ser positivo.")]
         public float? CostOfFreight { get; set; }
@@ -109,5 +111,19 @@ namespace HefestusApi.Models.Vendas
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "O preço unitário deve ser positivo.")]
         public decimal UnitPrice { get; set; }
+    }
+
+    public class OrderInstallment
+    {
+        public int OrderId { get; set; }
+        [JsonIgnore]
+        public Order Order { get; set; }
+        public int InstallmentNumber { get; set; }
+        [Required]
+        public int PaymentOptionId { get; set; }
+        [Required]
+        public PaymentOptions PaymentOption { get; set; }
+        public string Maturity { get; set; }
+        public decimal Value { get; set; }
     }
 }

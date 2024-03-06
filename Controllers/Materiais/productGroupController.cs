@@ -97,8 +97,8 @@ namespace HefestusApi.Controllers.Produtos
             return NoContent();
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<ProductGroup>>> GetPersonGroupBySearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<ProductGroup>>> GetPersonGroupBySearch(string searchTerm, string detailLevel)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {

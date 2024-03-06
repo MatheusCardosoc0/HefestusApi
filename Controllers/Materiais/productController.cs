@@ -4,12 +4,8 @@ using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Administracao;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace HefestusApi.Controllers.Produtos
 {
@@ -50,7 +46,9 @@ namespace HefestusApi.Controllers.Produtos
                 return NotFound($"Produto com o id {id} não existe");
             }
 
-            return Ok(product);
+            var dto = _mapper.Map<ProductPostOrPutDto>(product);
+
+            return Ok(dto);
         }
 
         [HttpPost]
@@ -61,9 +59,6 @@ namespace HefestusApi.Controllers.Produtos
                 Name = request.Name,
                 Description = request.Description,
                 PriceSale = request.PriceSale,
-                FamilyId = request.FamilyId,
-                GroupId = request.GroupId,
-                SubgroupId = request.SubGroupId,
                 LiquidCost = request.LiquidCost,
                 BruteCost = request.BruteCost,
                 GTIN = request.GTIN,
@@ -85,7 +80,7 @@ namespace HefestusApi.Controllers.Produtos
 
 
             var existingProductGroup = await _context.ProductGroups
-                    .FindAsync(request.GroupId);
+                    .FindAsync(request.ProductGroup.Id);
 
             if (existingProductGroup != null)
             {
@@ -94,12 +89,12 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Grupo de produtos {request.GroupId} não encontrada");
+                return BadRequest($"Grupo de produtos {request.ProductGroup.Id} não encontrada");
             }
 
 
             var existingProductFamily = await _context.ProductFamily
-                   .FindAsync(request.FamilyId);
+                   .FindAsync(request.ProductFamily.Id);
 
             if (existingProductFamily != null)
             {
@@ -108,12 +103,12 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Familia de produtos {request.FamilyId} não encontrada");
+                return BadRequest($"Familia de produtos {request.ProductFamily.Id} não encontrada");
             }
 
 
             var existingProductSubGroup = await _context.ProductSubGroup
-                   .FindAsync(request.SubGroupId);
+                   .FindAsync(request.ProductSubGroup.Id);
 
             if (existingProductSubGroup != null)
             {
@@ -122,7 +117,7 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Sub Grupo de produtos {request.SubGroupId} não encontrada");
+                return BadRequest($"Sub Grupo de produtos {request.ProductSubGroup.Id} não encontrada");
             }
 
 
@@ -149,9 +144,6 @@ namespace HefestusApi.Controllers.Produtos
                 product.Name = request.Name;
                 product.Description = request.Description;
                 product.PriceSale = request.PriceSale;
-                product.FamilyId = request.FamilyId;
-                product.GroupId = request.GroupId;
-                product.SubgroupId = request.SubGroupId;
                 product.LiquidCost = request.LiquidCost;
                 product.BruteCost = request.BruteCost;
                 product.GTIN = request.GTIN;
@@ -168,7 +160,7 @@ namespace HefestusApi.Controllers.Produtos
                 product.UnitOfMensuration = request.UnitOfMensuration;
 
             var existingProductGroup = await _context.ProductGroups
-                    .FindAsync(request.GroupId);
+                    .FindAsync(request.ProductGroup.Id);
 
             if (existingProductGroup != null)
             {
@@ -177,12 +169,12 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Grupo de produtos {request.GroupId} não encontrada");
+                return BadRequest($"Grupo de produtos {request.ProductGroup.Id} não encontrada");
             }
 
 
             var existingProductFamily = await _context.ProductFamily
-                   .FindAsync(request.FamilyId);
+                   .FindAsync(request.ProductFamily.Id);
 
             if (existingProductFamily != null)
             {
@@ -191,12 +183,12 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Familia de produtos {request.FamilyId} não encontrada");
+                return BadRequest($"Familia de produtos {request.ProductFamily.Id} não encontrada");
             }
 
 
             var existingProductSubGroup = await _context.ProductSubGroup
-                   .FindAsync(request.SubGroupId);
+                   .FindAsync(request.ProductSubGroup.Id);
 
             if (existingProductSubGroup != null)
             {
@@ -205,7 +197,7 @@ namespace HefestusApi.Controllers.Produtos
             }
             else
             {
-                return BadRequest($"Sub Grupo de produtos {request.SubGroupId} não encontrada");
+                return BadRequest($"Sub Grupo de produtos {request.ProductSubGroup.Id} não encontrada");
             }
 
             await _context.SaveChangesAsync();
@@ -237,8 +229,8 @@ namespace HefestusApi.Controllers.Produtos
             return NoContent();
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<ProductSearchTermDto>>> GetProductSearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<ProductSearchTermDto>>> GetProductSearch(string searchTerm, string detailLevel)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -247,11 +239,38 @@ namespace HefestusApi.Controllers.Produtos
 
             var lowerCaseSearchTerm = searchTerm.ToLower();
 
-            var product = await _context.Product
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
+            if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
+            {
+                var product = await _context.Product
+                   .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
+                   .Select(pg => new ProductSearchTermDto
+                   {
+                       Id = pg.Id,
+                       Name = pg.Name,
+                       PriceSale = pg.PriceSale,
+                       WholesalePrice = pg.WholesalePrice
+                   })
+                   .ToListAsync();
 
-            return Ok(product);
+                return Ok(product);
+            }
+            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
+            {
+                var productComplete = await _context.Product
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .Include(c => c.Group)
+                    .Include(c => c.Subgroup)
+                    .Include(c => c.Family)
+                    .ToListAsync();
+
+                var dto = _mapper.Map<IEnumerable<ProductPostOrPutDto>>(productComplete);
+
+                return Ok(dto);
+            }
+            else
+            {
+                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
+            }
         }
     }
 }

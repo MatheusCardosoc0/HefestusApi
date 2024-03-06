@@ -39,8 +39,8 @@ namespace HefestusApi.Controllers.Administracao
 
             return Ok(city);
         }
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<CitySearchTermDto>>> GetCityBySearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<CitySearchTermDto>>> GetCityBySearch(string searchTerm, string detailLevel)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -49,12 +49,27 @@ namespace HefestusApi.Controllers.Administracao
 
             var lowerCaseSearchTerm = searchTerm.ToLower();
 
-            var cities = await _context.Cities
-                .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .Select(c => new CitySearchTermDto { Id = c.Id, Name = c.Name})
-                .ToListAsync();
+            if(detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
+            {
+                var cities = await _context.Cities
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .Select(c => new CitySearchTermDto { Id = c.Id, Name = c.Name })
+                    .ToListAsync();
 
-            return Ok(cities);
+                return Ok(cities);
+            }
+            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
+            {
+                var citiesComplete = await _context.Cities
+                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
+                    .ToListAsync();
+
+                return Ok(citiesComplete);
+            }
+            else
+            {
+                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
+            }
         }
 
         [HttpPost]
