@@ -1,131 +1,93 @@
-﻿using HefestusApi.DTOs.Administracao;
+﻿using HefestusApi.DTOs.Pessoal;
 using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Produtos;
-using HefestusApi.Utils;
+using HefestusApi.Repositories.Data;
+using HefestusApi.Services.Materiais.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Produtos
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class productGroupController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IProductGroupService _productGroupService;
 
-        public productGroupController(DataContext context)
+        public productGroupController(IProductGroupService productGroupService)
         {
-            _context = context;
+            _productGroupService = productGroupService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ProductGroup>> GetProductGroups()
+        public async Task<IActionResult> GetAllProductGroups()
         {
-            var productGroups = await _context.ProductGroups.ToListAsync();
+            var serviceResponse = await _productGroupService.GetAllProductGroupsAsync();
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return Ok(serviceResponse.Data);
+        }
 
-            return Ok(productGroups);
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductGroupById(int id)
+        {
+            var serviceResponse = await _productGroupService.GetProductGroupByIdAsync(id);
+            if (!serviceResponse.Success)
+            {
+                return NotFound(serviceResponse.Message);
+            }
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<PersonGroup>> CreateProductGroup(ProductGroupDto request)
+        public async Task<IActionResult> CreateProductGroup([FromBody] ProductGroupRequestDataDto request)
         {
-            var existingProductGroup = await _context.ProductGroups.FirstOrDefaultAsync(p => p.Name == request.Name);
-
-            if (existingProductGroup != null)
+            var serviceResponse = await _productGroupService.CreateProductGroupAsync(request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Já existe um grupo de produtos com o nome {request.Name} cadastrado");
+                return BadRequest(serviceResponse.Message);
             }
 
-
-            var newProductGroup = new ProductGroup
-            {
-                Name = request.Name
-            };
-
-            _context.ProductGroups.Add(newProductGroup);
-            await _context.SaveChangesAsync();
-
-            return Ok(newProductGroup);
+            return CreatedAtAction(nameof(GetProductGroupById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProductGroup>> ChangeProductGroups(int id, ProductGroupDto request )
+        public async Task<IActionResult> UpdateProductGroup(int id, [FromBody] ProductGroupRequestDataDto request)
         {
-            var productGroups = await _context.ProductGroups.FindAsync(id);
-
-            if(productGroups == null)
+            var serviceResponse = await _productGroupService.UpdateProductGroupAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Grupo de produtos com o id {id} não existe");
+                return BadRequest(serviceResponse.Message);
             }
-
-            productGroups.Name = request.Name;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Grupo de produtos com o id {id} não pode ser alterado");
-            }
-
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ProductGroup>> DeleteProductGroup(int id)
+        public async Task<IActionResult> DeleteProductGroup(int id)
         {
-            var verifyProdutFamily = await _context.ProductGroups.FindAsync(id);
-
-            if (verifyProdutFamily == null)
+            var serviceResponse = await _productGroupService.DeleteProductGroupAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Familia de produtos com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            try
-            {
-                _context.ProductGroups.Remove(verifyProdutFamily);
-                _context.SaveChanges();
-            }
-            catch
-            {
-                return BadRequest("Não foi possivel deletar familia de produtos");
-            }
-
             return NoContent();
         }
 
         [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<ProductGroup>>> GetPersonGroupBySearch(string searchTerm, string detailLevel)
+        public async Task<IActionResult> SearchProductGroupByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _productGroupService.SearchProductGroupByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
-
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            var productSubGroup = await _context.ProductGroups
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
-
-            return Ok(productSubGroup);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductGroup>> GetProductGroupById(int id)
-        {
-            var productSubGroup = await _context.ProductGroups
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (productSubGroup == null)
-            {
-                return NotFound($"Familia de produtos com o ID {id} não existe");
-            }
-
-            return Ok(productSubGroup);
+            return Ok(serviceResponse.Data);
         }
     }
 }

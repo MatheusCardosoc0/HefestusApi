@@ -1,10 +1,12 @@
-﻿using HefestusApi.DTOs.Administracao;
+﻿using HefestusApi.DTOs.Pessoal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Globalization;
 
 namespace HefestusApi.Controllers.Others
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class fetchCityDataIBGEController : ControllerBase

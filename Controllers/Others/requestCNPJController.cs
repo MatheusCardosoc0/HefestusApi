@@ -1,9 +1,11 @@
-﻿using HefestusApi.Models.Administracao;
+﻿using HefestusApi.Models.Pessoal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace HefestusApi.Controllers.Others
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class requestCNPJController : ControllerBase

@@ -1,129 +1,79 @@
-﻿using HefestusApi.DTOs.Administracao;
-using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Administracao;
-using HefestusApi.Utils;
+﻿using HefestusApi.DTOs.Pessoal;
+using HefestusApi.Services;
+using HefestusApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.PESSOAL
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class personGroupController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IPersonGroupService _personGroupService;
 
-        public personGroupController(DataContext context)
+        public personGroupController(IPersonGroupService personGroupService)
         {
-            _context = context;
+            _personGroupService = personGroupService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<PersonGroup>> GetPersonGroups()
+        public async Task<ActionResult> GetAllPersonGroups()
         {
-            var personGroup = await _context.PersonGroup
-                .ToListAsync();
+            var serviceResponse = await _personGroupService.GetAllPersonGroupsAsync();
+            if (!serviceResponse.Success)
+            {
+                return StatusCode(500, serviceResponse.Message);
+            }
 
-            return Ok(personGroup);
+            return Ok(serviceResponse.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PersonGroup>> GetPersonGroupById(int id)
+        public async Task<ActionResult> GetPersonGroupById(int id)
         {
-            var personGroup = await _context.PersonGroup
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (personGroup == null)
+            var serviceResponse = await _personGroupService.GetPersonGroupByIdAsync(id);
+            if (!serviceResponse.Success)
             {
-                return NotFound($"Pessoa com o ID {id} não existe");
+                return NotFound(serviceResponse.Message);
             }
 
-            return Ok(personGroup);
+            return Ok(serviceResponse.Data);
         }
 
         [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PersonGroupSearchTermDto>>> GetPersonGroupBySearch(string searchTerm, string detailLevel)
+        public async Task<ActionResult> SearchPersonGroupByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _personGroupService.SearchPersonGroupByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
 
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
-            {
-                var personGroups = await _context.PersonGroup
-                    .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                    .ToListAsync();
-
-                return Ok(personGroups);
-            }
-            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
-            {
-                var personGroupComplete = await _context.PersonGroup
-                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                    .ToListAsync();
-
-                return Ok(personGroupComplete);
-            }
-            else
-            {
-                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
-            }
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<PersonGroup>> CreatePersonGroup(PersonGroupPostOrPutDto request)
+        public async Task<ActionResult> CreatePersonGroup([FromBody] PersonGroupRequestDataDto request)
         {
-            var existingPersonGroup = await _context.PersonGroup.FirstOrDefaultAsync(p => p.Name == request.Name);
-
-            if(existingPersonGroup != null)
+            var serviceResponse = await _personGroupService.CreatePersonGroupAsync(request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Já existe um grupo de pessoas com o nome {request.Name} cadastrado");
+                return BadRequest(serviceResponse.Message);
             }
 
-
-            var newPersonGroup = new PersonGroup
-            {
-                Name = request.Name
-            };
-
-            _context.PersonGroup.Add(newPersonGroup);
-            await _context.SaveChangesAsync();
-
-            return Ok(newPersonGroup);
-            //return CreatedAtAction(nameof(GetPersonGroupId), new { id = newGroup.Id }, newGroup);
+            return CreatedAtAction(nameof(GetPersonGroupById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PersonGroup>> UpdatePersonGroup(int id, PersonGroupPostOrPutDto request)
+        public async Task<ActionResult> UpdatePersonGroup(int id, [FromBody] PersonGroupRequestDataDto request)
         {
-            var personGroup = await _context.PersonGroup.FindAsync(id);
-
-            if (personGroup == null)
+            var serviceResponse = await _personGroupService.UpdatePersonGroupAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                return NotFound();
-            }
-
-            personGroup.Name = request.Name;
-            personGroup.LastModifiedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PersonGroupExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(serviceResponse.Message);
             }
 
             return NoContent();
@@ -132,36 +82,13 @@ namespace HefestusApi.Controllers.PESSOAL
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePersonGroup(int id)
         {
-            var personGroup = await _context.PersonGroup
-                .Include(x => x.Persons)
-                .FirstOrDefaultAsync(personGroup => personGroup.Id == id);
-
-            if (personGroup == null)
+            var serviceResponse = await _personGroupService.DeletePersonGroupAsync(id);
+            if (!serviceResponse.Success)
             {
-                return NotFound($"Pessoa com o ID {id} não existe");
-            }
-
-            if (personGroup.Persons.Any())
-            {
-                return BadRequest("Não é possível excluir o grupo de pessoas, pois existem pessoas associadas a ele.");
-            }
-
-            _context.PersonGroup.Remove(personGroup);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return StatusCode(500, "Internal server error while deleting the personGroup.");
+                return BadRequest(serviceResponse.Message);
             }
 
             return NoContent();
-        }
-
-        private bool PersonGroupExists(int id)
-        {
-            return _context.PersonGroup.Any(e => e.Id == id);
         }
     }
 }

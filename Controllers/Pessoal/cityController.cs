@@ -1,129 +1,78 @@
-﻿using HefestusApi.DTOs.Administracao;
-using HefestusApi.Models.Administracao;
-using HefestusApi.Utils;
+﻿using HefestusApi.DTOs.Pessoal;
+using HefestusApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace HefestusApi.Controllers.Administracao
+namespace HefestusApi.Controllers.PESSOAL
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class cityController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly ICityService _cityService;
 
-        public cityController(DataContext context)
+        public cityController(ICityService cityService)
         {
-            _context = context;
+            _cityService = cityService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<CityDto>> GetCitys()
+        public async Task<ActionResult> GetAllCities()
         {
-            var city = await _context.Cities
-                .ToListAsync();
+            var serviceResponse = await _cityService.GetAllCitiesAsync();
+            if (!serviceResponse.Success)
+            {
+                return StatusCode(500, serviceResponse.Message);
+            }
 
-            return Ok(city);
+            return Ok(serviceResponse.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<City>> GetCityById(int id)
+        public async Task<ActionResult> GetCityById(int id)
         {
-            var city = await _context.Cities
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (city == null)
+            var serviceResponse = await _cityService.GetCityByIdAsync(id);
+            if (!serviceResponse.Success)
             {
-                return NotFound($"Pessoa com o ID {id} não existe");
+                return NotFound(serviceResponse.Message);
             }
 
-            return Ok(city);
+            return Ok(serviceResponse.Data);
         }
+
         [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<CitySearchTermDto>>> GetCityBySearch(string searchTerm, string detailLevel)
+        public async Task<ActionResult> SearchCityByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _cityService.SearchCityByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
 
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            if(detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
-            {
-                var cities = await _context.Cities
-                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                    .Select(c => new CitySearchTermDto { Id = c.Id, Name = c.Name })
-                    .ToListAsync();
-
-                return Ok(cities);
-            }
-            else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
-            {
-                var citiesComplete = await _context.Cities
-                    .Where(c => c.Name.ToLower().Contains(lowerCaseSearchTerm))
-                    .ToListAsync();
-
-                return Ok(citiesComplete);
-            }
-            else
-            {
-                return BadRequest("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
-            }
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<City>> CreateCity(CityPostOrPutDto request)
+        public async Task<ActionResult> CreateCity([FromBody] CityRequestDataDto request)
         {
-            var checkCity = await _context.Cities
-                .FirstOrDefaultAsync(c => c.IBGENumber == request.IBGENumber);
-
-            if (checkCity != null)
+            var serviceResponse = await _cityService.CreateCityAsync(request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Cidade com o número de IBGE{checkCity.IBGENumber} já cadastrada");
+                return BadRequest(serviceResponse.Message);
             }
 
-            var newCity = new City
-            {
-                Name = request.Name,
-                IBGENumber = request.IBGENumber,
-                State = request.State
-            };
-
-            _context.Cities.Add(newCity);
-            await _context.SaveChangesAsync();
-
-            return Ok(newCity);
+            return CreatedAtAction(nameof(GetCityById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<City>> UpdateCity(int id, CityPostOrPutDto request)
+        public async Task<ActionResult> UpdateCity(int id, [FromBody] CityRequestDataDto request)
         {
-            var city = await _context.Cities.FindAsync(id);
-
-            if (city == null)
+            var serviceResponse = await _cityService.UpdateCityAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                return NotFound($"Cidade com este id não encontrada");
-            }
-
-            city.Name = request.Name;
-            city.State = request.State;
-            city.IBGENumber = request.IBGENumber;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(serviceResponse.Message);
             }
 
             return NoContent();
@@ -132,35 +81,13 @@ namespace HefestusApi.Controllers.Administracao
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCity(int id)
         {
-            var city = await _context.Cities
-                .Include(x => x.Persons)
-                .FirstOrDefaultAsync(city => city.Id == id);
-
-            if (city == null)
+            var serviceResponse = await _cityService.DeleteCityAsync(id);
+            if (!serviceResponse.Success)
             {
-                return NotFound($"Cidade com o ID {id} não existe");
+                return BadRequest(serviceResponse.Message);
             }
 
-            if (city.Persons.Any())
-            {
-                return BadRequest("Não é possível excluir a cidade, pois existem pessoas associadas a ele.");
-            }
-
-            _context.Cities.Remove(city);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return StatusCode(500, "Internal server error while deleting the city.");
-            }
             return NoContent();
-        }
-
-        private bool CityExists(int id)
-        {
-            return _context.Cities.Any(e => e.Id == id);
         }
     }
 }

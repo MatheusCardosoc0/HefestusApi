@@ -1,15 +1,15 @@
-﻿namespace HefestusApi.DTOs.Administracao
+﻿namespace HefestusApi.DTOs.Pessoal
 {
     public record struct PersonGroupDto(
         int Id,
         string Name
         );
 
-    public record struct PersonGroupPostOrPutDto(
+    public record struct PersonGroupRequestDataDto(
        string Name
        );
 
-    public record struct PersonGroupSearchTermDto(
+    public record struct PersonGroupSimpleSearchDataDto(
         int Id,
         string Name
         );

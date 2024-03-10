@@ -1,13 +1,15 @@
 ﻿using HefestusApi.DTOs.Financeiro;
 using HefestusApi.Models.Financeiro;
 using HefestusApi.Models.Produtos;
-using HefestusApi.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using HefestusApi.Repositories.Data;
 
 namespace HefestusApi.Controllers.Financeiro
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class paymentConditionController : ControllerBase

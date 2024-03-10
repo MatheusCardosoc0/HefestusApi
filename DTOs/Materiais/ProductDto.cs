@@ -27,7 +27,7 @@
         string UnitOfMensuration
     );
 
-    public record struct ProductPostOrPutDto(
+    public record struct ProductRequestDataDto(
         int Id,
         string Name,
         string? Description,
@@ -43,15 +43,15 @@
         int NCM,
         string GTIN,
         string? GTINtrib,
-        ProductFamilySearchTermDto ProductFamily,
-        ProductGroupSearchTermDto ProductGroup,
-        ProductSubGroupSearchTermDto ProductSubGroup,
+        ProductFamilySimpleSearchDataDto Family,
+        ProductGroupSimpleSearchDataDto Group,
+        ProductSubGroupSimpleSearchDataDto SubGroup,
         string? Reference,
         string? Batch,
         string UnitOfMensuration
     );
 
-    public record struct ProductSearchTermDto (
+    public record struct ProductSimpleSearchDataDto (
         int Id,
         string Name,
         float PriceSale,

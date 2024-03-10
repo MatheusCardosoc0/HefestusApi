@@ -1,17 +1,22 @@
-﻿namespace HefestusApi.DTOs.Administracao
+﻿namespace HefestusApi.DTOs.Pessoal
 {
     public record struct UserPersonViewDto(
         int Id,
         string Name,
         string UrlImage
         );
-    public record struct UserDto(
+    public record struct UserRequestDataDto(
         string Name,
         string Password,
         int PersonId
         );
 
-    public record struct UserViewDto(
+    public record struct UserSimpleSearchDataDto(
+        int Id,
+        string Name
+        );
+
+    public record struct UserDto(
        int ID,
        string Name,
        UserPersonViewDto Person

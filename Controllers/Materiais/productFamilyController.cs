@@ -1,136 +1,87 @@
 ﻿using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Administracao;
-using HefestusApi.Models.Produtos;
-using HefestusApi.Utils;
-using Microsoft.AspNetCore.Http;
+using HefestusApi.Services.Materiais.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Produtos
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class productFamilyController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IProductFamilyService _productFamilyService;
 
-        public productFamilyController(DataContext context)
+        public productFamilyController(IProductFamilyService productFamilyService)
         {
-            _context = context;
+            _productFamilyService = productFamilyService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ProductFamily>> GetProductFamily()
+        public async Task<IActionResult> GetAllProductFamilys()
         {
-            var productFamily = await _context.ProductFamily.ToListAsync();
-
-            return Ok(productFamily);
+            var serviceResponse = await _productFamilyService.GetAllProductFamiliesAsync();
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return Ok(serviceResponse.Data);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ProductFamily>> ChangeProductFamily(int id, ProductFamilyDto request)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductFamilyById(int id)
         {
-            var productFamily = await _context.ProductFamily.FindAsync(id);
-
-            if (productFamily == null)
+            var serviceResponse = await _productFamilyService.GetProductFamilyByIdAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Familia de produtos com o id {id} não existe");
+                return NotFound(serviceResponse.Message);
             }
-
-            productFamily.Name = request.Name;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Familia de produtos com o id {id} não pode ser alterado");
-            }
-
-            return NoContent();
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProductFamily>> CreateProductFamily(ProductFamilyDto request)
+        public async Task<IActionResult> CreateProductFamily([FromBody] ProductFamilyRequestDataDto request)
         {
-            var verifyProductFamily = await _context.ProductFamily.FirstOrDefaultAsync(pf => pf.Name == request.Name);
-
-            if (verifyProductFamily != null)
+            var serviceResponse = await _productFamilyService.CreateProductFamilyAsync(request);
+            if (!serviceResponse.Success)
             {
-                BadRequest($"Já existe uma familia de produtos com esse nome");
+                return BadRequest(serviceResponse.Message);
             }
+            
+            return CreatedAtAction(nameof(GetProductFamilyById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+        }
 
-            var newProductFamily = new ProductFamily
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProductFamily(int id, [FromBody] ProductFamilyRequestDataDto request)
+        {
+            var serviceResponse = await _productFamilyService.UpdateProductFamilyAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                Name = request.Name,
-            };
-
-            try
-            {
-                _context.ProductFamily.Add(newProductFamily);
-                await _context.SaveChangesAsync();
+                return BadRequest(serviceResponse.Message);
             }
-            catch
-            {
-                return BadRequest("Erro ao Criar familia de produto");
-            }
-
-            return Ok(newProductFamily);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ProductFamily>> DeleteProductFamily(int id)
+        public async Task<IActionResult> DeleteProductFamily(int id)
         {
-            var verifyProdutFamily = await _context.ProductFamily.FindAsync(id);
-
-            if(verifyProdutFamily == null)
+            var serviceResponse = await _productFamilyService.DeleteProductFamilyAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Familia de produtos com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            try
-            {
-                _context.ProductFamily.Remove(verifyProdutFamily);
-                _context.SaveChanges();
-            }
-            catch
-            {
-                return BadRequest("Não foi possivel deletar familia de produtos");
-            }
-
             return NoContent();
         }
 
         [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<ProductFamily>>> GetPersonGroupBySearch(string searchTerm, string detailLevel)
+        public async Task<IActionResult> SearchProductFamilyByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _productFamilyService.SearchProductFamilyByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
-
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            var productFamily = await _context.ProductFamily
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
-
-            return Ok(productFamily);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductFamily>> GetProductFamilyById(int id)
-        {
-            var productFamily = await _context.ProductFamily
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (productFamily == null)
-            {
-                return NotFound($"Familia de produtos com o ID {id} não existe");
-            }
-
-            return Ok(productFamily);
+            return Ok(serviceResponse.Data);
         }
     }
 }

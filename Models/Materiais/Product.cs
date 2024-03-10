@@ -1,4 +1,4 @@
-﻿using HefestusApi.Models.Administracao;
+﻿using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Vendas;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
@@ -39,9 +39,9 @@ namespace HefestusApi.Models.Produtos
         public string? Batch {  get; set; }
         public string UnitOfMensuration { get; set; }
 
-        public required ProductFamily Family { get; set; }
-        public required ProductGroup Group { get; set; }
-        public required ProductSubGroup Subgroup { get; set; }
+        public ProductFamily Family { get; set; }
+        public ProductGroup Group { get; set; }
+        public ProductSubGroup Subgroup { get; set; }
 
         [JsonIgnore]
         public List<OrderProduct>? OrderProducts { get; set; }

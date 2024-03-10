@@ -1,4 +1,4 @@
-﻿namespace HefestusApi.DTOs.Administracao
+﻿namespace HefestusApi.DTOs.Pessoal
 {
     public record struct CityDto(
         int Id,
@@ -7,14 +7,14 @@
         string State
     );
 
-    public record struct CitySearchTermDto(
-        int Id,
-        string Name
-    );
-
-    public record struct CityPostOrPutDto(
+    public record struct CityRequestDataDto(
         string Name,
         int IBGENumber,
         string State
+    );
+
+    public record struct CitySimpleSearchDataDto(
+        int Id,
+        string Name
     );
 }

@@ -1,13 +1,23 @@
 using Api.Utilities;
-using HefestusApi.Data;
-using HefestusApi.Utils;
+using HefestusApi.Repositories.Data;
+using HefestusApi.Services.Interfaces;
+using HefestusApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
-using System.Text.Json.Serialization;
+using HefestusApi.Repositories.Interfaces;
+using HefestusApi.Repositories;
+using HefestusApi.Repositories.Pessoal.Interfaces;
+using HefestusApi.Repositories.Pessoal;
+using HefestusApi.Services.Pessoal.Interfaces;
+using HefestusApi.Services.Pessoal;
+using HefestusApi.Services.Materiais.Interfaces;
+using HefestusApi.Services.Materiais;
+using HefestusApi.Repositories.Materiais;
+using HefestusApi.Repositories.Materiais.Interfaces;
 
 namespace HefestusApi
 {
@@ -53,7 +63,29 @@ namespace HefestusApi
             //{
             //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             //});
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
+            builder.Services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
+            builder.Services.AddScoped<IProductGroupService, ProductGroupService>();
+
+            builder.Services.AddScoped<IProductSubGroupRepository, ProductSubGroupRepository>();
+            builder.Services.AddScoped<IProductSubGroupService, ProductSubGroupService>();
+
+            builder.Services.AddScoped<IProductFamilyRepository, ProductFamilyRepository>();
+            builder.Services.AddScoped<IProductFamilyService, ProductFamilyService>();
+
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            builder.Services.AddScoped<ICityRepository, CityRepository>();
+            builder.Services.AddScoped<ICityService, CityService>();
+
+            builder.Services.AddScoped<IPersonGroupRepository, PersonGroupRepository>();
+            builder.Services.AddScoped<IPersonGroupService, PersonGroupService>();
+
+            builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+            builder.Services.AddScoped<IPersonService, PersonService>();
 
             builder.Services.AddScoped<TokenService>();
 

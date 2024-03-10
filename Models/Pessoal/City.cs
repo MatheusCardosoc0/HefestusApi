@@ -1,7 +1,7 @@
 ﻿using HefestusApi.Models.Interfaces;
 using System.Text.Json.Serialization;
 
-namespace HefestusApi.Models.Administracao
+namespace HefestusApi.Models.Pessoal
 {
     public class City : TimeTrail 
     {

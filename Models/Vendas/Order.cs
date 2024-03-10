@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Financeiro;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Models.Vendas;
+using HefestusApi.Models.Interfaces;
 
 namespace HefestusApi.Models.Vendas
 {
     /// <summary>
     /// Representa uma ordem de venda no sistema.
     /// </summary>
-    public class Order
+    public class Order : TimeTrail
     {
         [Key]
         public int Id { get; set; }

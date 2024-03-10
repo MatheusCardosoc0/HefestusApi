@@ -5,9 +5,13 @@
         string Name
         );
 
-    public record struct ProductFamilySearchTermDto(
+    public record struct ProductFamilySimpleSearchDataDto(
         int Id,
         string Name
         );
+
+    public record struct ProductFamilyRequestDataDto(
+       string Name
+       );
 }
 

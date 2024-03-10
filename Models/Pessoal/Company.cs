@@ -1,4 +1,4 @@
-﻿namespace HefestusApi.Models.Administracao
+﻿namespace HefestusApi.Models.Pessoal
 {
     public class Company
     {

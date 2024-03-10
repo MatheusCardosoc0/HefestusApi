@@ -1,6 +1,7 @@
 ﻿using HefestusApi.DTOs.Produtos;
+using HefestusApi.Models.Pessoal;
 
-namespace HefestusApi.DTOs.Administracao
+namespace HefestusApi.DTOs.Pessoal
 {
 public record struct PersonDto(
         int Id,
@@ -29,7 +30,7 @@ public record struct PersonDto(
         string PersonType
         );
 
-    public record struct PersonPostOrPutDto(
+    public record struct PersonRequestDataDto(
         int Id,
         string Name,
         string Email,
@@ -47,14 +48,14 @@ public record struct PersonDto(
         string? MaritalStatus,
         string? Habilities,
         string? Description,
-        List<PersonGroupSearchTermDto> PersonGroup,
-        CitySearchTermDto City,
+        List<PersonGroupSimpleSearchDataDto> PersonGroup,
+        CitySimpleSearchDataDto City,
         string? Gender,
         bool? ICMSContributor,
         string PersonType
         );
 
-    public record struct PersonSearchTermDto(
+    public record struct PersonSimpleSearchDataDto(
         int Id,
         string Name
         );

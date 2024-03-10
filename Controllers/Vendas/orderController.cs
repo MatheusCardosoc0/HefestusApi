@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
-using HefestusApi.DTOs.Administracao;
 using HefestusApi.DTOs.Vendas;
-using HefestusApi.Models.Administracao;
-using HefestusApi.Models.Financeiro;
-using HefestusApi.Models.Produtos;
 using HefestusApi.Models.Vendas;
-using HefestusApi.Utils;
+using HefestusApi.Repositories.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Vendas
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class orderController : ControllerBase

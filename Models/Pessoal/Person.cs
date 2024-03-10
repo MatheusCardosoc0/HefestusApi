@@ -3,7 +3,7 @@ using HefestusApi.Models.Vendas;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace HefestusApi.Models.Administracao
+namespace HefestusApi.Models.Pessoal
 {
     public class Person : TimeTrail
     {
