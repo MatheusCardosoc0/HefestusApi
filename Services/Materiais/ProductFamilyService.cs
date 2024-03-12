@@ -5,9 +5,9 @@ using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Repositories.Interfaces;
 using HefestusApi.Repositories.Materiais.Interfaces;
-using HefestusApi.Services.functions;
 using HefestusApi.Services.Interfaces;
 using HefestusApi.Services.Materiais.Interfaces;
+using HefestusApi.Utilities.functions;
 
 namespace HefestusApi.Services.Materiais
 {

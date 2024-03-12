@@ -7,13 +7,13 @@
         int Interval
         );
 
-    public record struct PaymentConditionPostOrPutDto(
+    public record struct PaymentConditionRequestDataDto(
         string Name,
         int Installments,
         int Interval
         );
 
-    public record struct PaymentConditionSearchTermDto(
+    public record struct PaymentConditionSimpleSearchDataDto(
         int Id,
         string Name
         );

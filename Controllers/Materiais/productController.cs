@@ -54,7 +54,7 @@ namespace HefestusApi.Controllers.Produtos
             {
                 return BadRequest(serviceResponse.Message);
             }
-            // Assumindo que a resposta inclui a entidade criada ou seu DTO
+            
             return CreatedAtAction(nameof(GetProductById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 

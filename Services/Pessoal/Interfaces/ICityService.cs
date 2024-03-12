@@ -1,6 +1,6 @@
 ﻿using HefestusApi.DTOs.Pessoal;
 using HefestusApi.Models.Pessoal;
-using HefestusApi.Services.functions;
+using HefestusApi.Utilities.functions;
 
 namespace HefestusApi.Services.Interfaces
 {

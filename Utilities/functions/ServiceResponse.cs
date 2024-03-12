@@ -1,4 +1,4 @@
-﻿namespace HefestusApi.Services.functions
+﻿namespace HefestusApi.Utilities.functions
 {
     public class ServiceResponse<T>
     {

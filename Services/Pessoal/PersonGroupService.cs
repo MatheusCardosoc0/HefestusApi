@@ -2,8 +2,8 @@
 using HefestusApi.Models.Pessoal;
 using HefestusApi.Repositories;
 using HefestusApi.Repositories.Interfaces;
-using HefestusApi.Services.functions;
 using HefestusApi.Services.Interfaces;
+using HefestusApi.Utilities.functions;
 
 namespace HefestusApi.Services
 {

@@ -1,6 +1,9 @@
 ﻿using HefestusApi.DTOs.Financeiro;
+using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Financeiro;
 using HefestusApi.Repositories.Data;
+using HefestusApi.Services.Financeiro.Interfaces;
+using HefestusApi.Services.Materiais.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,109 +15,78 @@ namespace HefestusApi.Controllers.Financeiro
     [ApiController]
     public class paymentOptionsController : ControllerBase
     {
-        private readonly DataContext _context;
-        public paymentOptionsController(DataContext context)
-        {
-            _context = context;
-        }
-        [HttpGet]
-        public async Task<ActionResult<PaymentOptions>> GetPaymentOptions()
-        {
-            var paymentOptions = await _context.PaymentOptions.ToListAsync();
+        private readonly IPaymentOptionService _paymentOptionsService;
 
-            return Ok(paymentOptions);
+        public paymentOptionsController(IPaymentOptionService paymentOptionsService)
+        {
+            _paymentOptionsService = paymentOptionsService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllPaymentOptions()
+        {
+            var serviceResponse = await _paymentOptionsService.GetAllPaymentOptionsAsync();
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return Ok(serviceResponse.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaymentOptions>> GetPaymentOptionsById(int id)
+        public async Task<IActionResult> GetPaymentOptionById(int id)
         {
-            var paymentOptions = await _context.PaymentOptions.FirstOrDefaultAsync(c => c.Id == id);
-
-            if(paymentOptions == null)
+            var serviceResponse = await _paymentOptionsService.GetPaymentOptionByIdAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return NotFound(serviceResponse.Message);
             }
-
-            return Ok(paymentOptions);
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<PaymentOptions>> PostPaymentOptions(PaymentOptionsPostOrPutDto request)
+        public async Task<IActionResult> CreatePaymentOption([FromBody] PaymentOptionRequestDataDto request)
         {
-            var newPaymentOption = new PaymentOptions
+            var serviceResponse = await _paymentOptionsService.CreatePaymentOptionAsync(request);
+            if (!serviceResponse.Success)
             {
-                Name = request.Name,
-                isUseCreditLimit = request.IsUseCreditLimit
-            };
-
-            _context.PaymentOptions.Add(newPaymentOption);
-            await _context.SaveChangesAsync();
-            return Ok(newPaymentOption);
+                return BadRequest(serviceResponse.Message);
+            }
+           
+            return CreatedAtAction(nameof(GetPaymentOptionById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PaymentOptions>> PutPaymentOptions(int id, PaymentOptionsPostOrPutDto request)
+        public async Task<IActionResult> UpdatePaymentOption(int id, [FromBody] PaymentOptionRequestDataDto request)
         {
-            var PaymentOption = await _context.PaymentOptions.FirstOrDefaultAsync(c => c.Id == id);
-
-            if(PaymentOption == null)
+            var serviceResponse = await _paymentOptionsService.UpdatePaymentOptionAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            PaymentOption.Name = request.Name;
-            PaymentOption.isUseCreditLimit = request.IsUseCreditLimit;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Não foi possivel alterar o metodo de pagamento com o id {id}");
-            }
-
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PaymentOptionsDto>> DeletePaymentOption(int id)
+        public async Task<IActionResult> DeletePaymentOption(int id)
         {
-            var PaymentOption = await _context.PaymentOptions.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (PaymentOption == null)
+            var serviceResponse = await _paymentOptionsService.DeletePaymentOptionAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            _context.Remove(PaymentOption);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Não foi possivel remover o metodo de pagamento com o id {id}");
-            }
-
             return NoContent();
         }
 
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PaymentOptionsSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<IActionResult> SearchPaymentOptionByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _paymentOptionsService.SearchPaymentOptionByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
-
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            var paymentOptions = await _context.PaymentOptions
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
-
-            return Ok(paymentOptions);
+            return Ok(serviceResponse.Data);
         }
     }
 }

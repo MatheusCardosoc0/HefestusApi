@@ -2,7 +2,7 @@
 using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Produtos;
-using HefestusApi.Services.functions;
+using HefestusApi.Utilities.functions;
 
 namespace HefestusApi.Services.Materiais.Interfaces
 {

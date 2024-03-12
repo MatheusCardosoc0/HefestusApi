@@ -1,11 +1,7 @@
 ﻿using HefestusApi.DTOs.Financeiro;
-using HefestusApi.Models.Financeiro;
-using HefestusApi.Models.Produtos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using HefestusApi.Repositories.Data;
+using HefestusApi.Services.Financeiro.Interfaces;
 
 namespace HefestusApi.Controllers.Financeiro
 {
@@ -14,113 +10,78 @@ namespace HefestusApi.Controllers.Financeiro
     [ApiController]
     public class paymentConditionController : ControllerBase
     {
-        private readonly DataContext _context;
-        public paymentConditionController(DataContext context)
-        {
-            _context = context;
-        }
-        [HttpGet]
-        public async Task<ActionResult<PaymentCondition>> GetPaymentCondition()
-        {
-            var paymentCondition = await _context.PaymentCondition.ToListAsync();
+        private readonly IPaymentConditionService _paymentConditionService;
 
-            return Ok(paymentCondition);
+        public paymentConditionController(IPaymentConditionService paymentConditionService)
+        {
+            _paymentConditionService = paymentConditionService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllPaymentCondition()
+        {
+            var serviceResponse = await _paymentConditionService.GetAllPaymentConditionsAsync();
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return Ok(serviceResponse.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaymentCondition>> GetPaymentConditionById(int id)
+        public async Task<IActionResult> GetPaymentConditionById(int id)
         {
-            var paymentCondition = await _context.PaymentCondition.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (paymentCondition == null)
+            var serviceResponse = await _paymentConditionService.GetPaymentConditionByIdAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return NotFound(serviceResponse.Message);
             }
-
-            return Ok(paymentCondition);
+            return Ok(serviceResponse.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<PaymentCondition>> PostPaymentCondition(PaymentConditionPostOrPutDto request)
+        public async Task<IActionResult> CreatePaymentCondition([FromBody] PaymentConditionRequestDataDto request)
         {
-            var newPaymentCondition = new PaymentCondition
+            var serviceResponse = await _paymentConditionService.CreatePaymentConditionAsync(request);
+            if (!serviceResponse.Success)
             {
-                Name = request.Name,
-                Installments = request.Interval,
-                Interval = request.Interval,
-            };
+                return BadRequest(serviceResponse.Message);
+            }
 
-            _context.PaymentCondition.Add(newPaymentCondition);
-            await _context.SaveChangesAsync();
-            return Ok(newPaymentCondition);
+            return CreatedAtAction(nameof(GetPaymentConditionById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PaymentCondition>> PutPaymentCondition(int id, PaymentConditionPostOrPutDto request)
+        public async Task<IActionResult> UpdatePaymentCondition(int id, [FromBody] PaymentConditionRequestDataDto request)
         {
-            var PaymentCondition = await _context.PaymentCondition.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (PaymentCondition == null)
+            var serviceResponse = await _paymentConditionService.UpdatePaymentConditionAsync(id, request);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            PaymentCondition.Name = request.Name;
-            PaymentCondition.Interval = request.Interval;
-            PaymentCondition.Installments = request.Installments;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Não foi possivel alterar o metodo de pagamento com o id {id}");
-            }
-
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PaymentCondition>> DeletePaymentCondition(int id)
+        public async Task<IActionResult> DeletePaymentCondition(int id)
         {
-            var PaymentCondition = await _context.PaymentCondition.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (PaymentCondition == null)
+            var serviceResponse = await _paymentConditionService.DeletePaymentConditionAsync(id);
+            if (!serviceResponse.Success)
             {
-                return BadRequest($"Opção de pagamento com o id {id} não encontrado");
+                return BadRequest(serviceResponse.Message);
             }
-
-            _context.Remove(PaymentCondition);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return BadRequest($"Não foi possivel remover o metodo de pagamento com o id {id}");
-            }
-
             return NoContent();
         }
 
-
-        [HttpGet("search/{searchTerm}")]
-        public async Task<ActionResult<IEnumerable<PaymentConditionSearchTermDto>>> GetPersonGroupBySearch(string searchTerm)
+        [HttpGet("search/{detailLevel}/{searchTerm}")]
+        public async Task<IActionResult> SearchPaymentConditionByName(string searchTerm, string detailLevel)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            var serviceResponse = await _paymentConditionService.SearchPaymentConditionByNameAsync(searchTerm, detailLevel);
+            if (!serviceResponse.Success)
             {
-                return BadRequest("Não foi informado um termo de pesquisa");
+                return BadRequest(serviceResponse.Message);
             }
-
-            var lowerCaseSearchTerm = searchTerm.ToLower();
-
-            var paymentConditions = await _context.PaymentCondition
-                .Where(pg => pg.Name.ToLower().Contains(lowerCaseSearchTerm))
-                .ToListAsync();
-
-            return Ok(paymentConditions);
+            return Ok(serviceResponse.Data);
         }
     }
 }

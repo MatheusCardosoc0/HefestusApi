@@ -29,7 +29,7 @@ namespace HefestusApi.Services.Mapping
                 .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Order.Client.Name))
                 .ForMember(dest => dest.DateOfCompletion, opt => opt.MapFrom(src => src.Order.DateOfCompletion));
             CreateMap<PaymentCondition, PaymentConditionDto>();
-            CreateMap<PaymentOptions, PaymentOptionsDto>();
+            CreateMap<PaymentOptions, PaymentOptionDto>();
 
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Group.Name))

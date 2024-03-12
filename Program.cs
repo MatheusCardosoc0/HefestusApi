@@ -18,6 +18,10 @@ using HefestusApi.Services.Materiais.Interfaces;
 using HefestusApi.Services.Materiais;
 using HefestusApi.Repositories.Materiais;
 using HefestusApi.Repositories.Materiais.Interfaces;
+using HefestusApi.Repositories.Financeiro.Interfaces;
+using HefestusApi.Services.Financeiro.Interfaces;
+using HefestusApi.Services.Financeiro;
+using HefestusApi.Repositories.Financeiro;
 
 namespace HefestusApi
 {
@@ -63,6 +67,12 @@ namespace HefestusApi
             //{
             //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             //});
+            builder.Services.AddScoped<IPaymentOptionsRepository, PaymentOptionsRepository>();
+            builder.Services.AddScoped<IPaymentOptionService, PaymentOptionService>();
+
+            builder.Services.AddScoped<IPaymentConditionRepository, PaymentConditionRepository>();
+            builder.Services.AddScoped<IPaymentConditionService, PaymentConditionService>();
+
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 

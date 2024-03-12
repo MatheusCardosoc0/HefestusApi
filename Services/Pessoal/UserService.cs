@@ -3,8 +3,8 @@ using HefestusApi.DTOs.Pessoal;
 using HefestusApi.Models.Pessoal;
 using HefestusApi.Repositories.Interfaces;
 using HefestusApi.Repositories.Pessoal.Interfaces;
-using HefestusApi.Services.functions;
 using HefestusApi.Services.Pessoal.Interfaces;
+using HefestusApi.Utilities.functions;
 
 namespace HefestusApi.Services.Pessoal
 {
