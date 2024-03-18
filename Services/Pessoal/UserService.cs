@@ -124,7 +124,7 @@ namespace HefestusApi.Services.Pessoal
                     return response;
                 }
 
-                if(existingPerson == null)
+                if (existingPerson == null)
                 {
                     response.Success = false;
                     response.Message = $"Pessoa com o id {request.PersonId} não encontrada!";

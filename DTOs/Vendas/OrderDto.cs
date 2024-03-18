@@ -1,4 +1,6 @@
-﻿using HefestusApi.DTOs.Produtos;
+﻿using HefestusApi.DTOs.Financeiro;
+using HefestusApi.DTOs.Pessoal;
+using HefestusApi.DTOs.Produtos;
 using HefestusApi.Models.Financeiro;
 
 namespace HefestusApi.DTOs.Vendas
@@ -22,17 +24,17 @@ namespace HefestusApi.DTOs.Vendas
         float Discount,
         string TypeOrder,
         float? CostOfFreight,
-        string? TypeFreight,
+        int TypeFreight,
         string DateOfCompletion
         );
 
     public record struct OrderPostOrPutDto(
-        int ClientId,
-        int ResponsibleId,
-        List<OrderProductPostOrPutDto> OrderProducts,
-        List<OrderInstallmentPostOrPutDto> OrderInstallments,
-        int PaymentConditionId,
-        int PaymentOptionId,
+        PersonSimpleSearchDataDto Client,
+        PersonSimpleSearchDataDto Responsible,
+        List<OrderProductRequestdataDto> OrderProducts,
+        List<OrderInstallmentRequestDataDto> OrderInstallments,
+        PaymentConditionSimpleSearchDataDto PaymentCondition,
+        PaymentOptionSimpleSearchDataDto PaymentOption,
         int? InvoiceId,
         decimal TotalValue,
         decimal LiquidValue,
@@ -40,7 +42,7 @@ namespace HefestusApi.DTOs.Vendas
         float Discount,
         string TypeOrder,
         float? CostOfFreight,
-        string? TypeFreight
+        int TypeFreight
         );
 
     public record struct OrderInstallmentDto(
@@ -54,7 +56,7 @@ namespace HefestusApi.DTOs.Vendas
         string DateOfCompletion
         );
 
-    public record struct OrderInstallmentPostOrPutDto(
+    public record struct OrderInstallmentRequestDataDto(
        int OrderId,
        int InstallmentNumber,
        int PaymentOptionId,
@@ -72,7 +74,7 @@ namespace HefestusApi.DTOs.Vendas
          decimal TotalPrice
         );
 
-    public record struct OrderProductPostOrPutDto(
+    public record struct OrderProductRequestdataDto(
          int OrderId,
          int ProductId,
          decimal UnitPrice,

@@ -78,7 +78,7 @@ namespace HefestusApi.Models.Vendas
         [Range(0, double.MaxValue, ErrorMessage = "O custo do frete deve ser positivo.")]
         public float? CostOfFreight { get; set; }
 
-        public string? TypeFreight { get; set; }
+        public int TypeFreight { get; set; }
     }
 
     /// <summary>

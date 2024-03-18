@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HefestusApi.Controllers.PESSOAL
 
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class personController : ControllerBase

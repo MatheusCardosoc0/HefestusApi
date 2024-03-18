@@ -250,7 +250,7 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PersonId")
+                    b.Property<int?>("PersonId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -474,8 +474,8 @@ namespace HefestusApi.Migrations
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("TypeFreight")
-                        .HasColumnType("text");
+                    b.Property<int>("TypeFreight")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TypeOrder")
                         .IsRequired()
@@ -733,8 +733,7 @@ namespace HefestusApi.Migrations
 
             modelBuilder.Entity("HefestusApi.Models.Pessoal.User", b =>
                 {
-                    b.Navigation("Person")
-                        .IsRequired();
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Produtos.Product", b =>

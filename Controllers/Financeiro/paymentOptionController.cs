@@ -13,11 +13,11 @@ namespace HefestusApi.Controllers.Financeiro
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class paymentOptionsController : ControllerBase
+    public class paymentOptionController : ControllerBase
     {
         private readonly IPaymentOptionService _paymentOptionsService;
 
-        public paymentOptionsController(IPaymentOptionService paymentOptionsService)
+        public paymentOptionController(IPaymentOptionService paymentOptionsService)
         {
             _paymentOptionsService = paymentOptionsService;
         }

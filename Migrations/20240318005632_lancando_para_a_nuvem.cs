@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class primeira_migracao : Migration
+    public partial class lancando_para_a_nuvem : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -119,7 +119,7 @@ namespace HefestusApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
-                    PersonId = table.Column<int>(type: "integer", nullable: false)
+                    PersonId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -258,7 +258,7 @@ namespace HefestusApi.Migrations
                     Discount = table.Column<float>(type: "real", nullable: false),
                     TypeOrder = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CostOfFreight = table.Column<float>(type: "real", nullable: false),
-                    TypeFreight = table.Column<string>(type: "text", nullable: true),
+                    TypeFreight = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<string>(type: "text", nullable: false),
                     LastModifiedAt = table.Column<string>(type: "text", nullable: false)
                 },

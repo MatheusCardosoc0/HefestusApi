@@ -50,10 +50,10 @@ namespace HefestusApi.Controllers.Vendas
            
                 var newOrder = new Order
                 {
-                    ClientId = request.ClientId,
-                    ResponsibleId = request.ResponsibleId,
-                    PaymentConditionId = request.PaymentConditionId,
-                    PaymentOptionId = request.PaymentOptionId,
+                    ClientId = request.Client.Id,
+                    ResponsibleId = request.Responsible.Id,
+                    PaymentConditionId = request.PaymentCondition.Id,
+                    PaymentOptionId = request.PaymentOption.Id,
                     InvoiceId = request.InvoiceId,
                     TotalValue = request.TotalValue,
                     LiquidValue = request.LiquidValue,

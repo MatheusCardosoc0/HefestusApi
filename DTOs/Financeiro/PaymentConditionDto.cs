@@ -15,6 +15,8 @@
 
     public record struct PaymentConditionSimpleSearchDataDto(
         int Id,
-        string Name
+        string Name,
+        int Installments,
+        int Interval
         );
 }
