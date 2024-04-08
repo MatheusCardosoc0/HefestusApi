@@ -62,7 +62,7 @@ namespace HefestusApi.Controllers.Pessoal
                 return BadRequest(serviceResponse.Message);
             }
 
-            return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+            return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id }, serviceResponse?.Data);
         }
 
         [HttpPut("{id}")]

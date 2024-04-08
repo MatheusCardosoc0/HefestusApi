@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class lancando_para_a_nuvem : Migration
+    public partial class primeiro : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -206,7 +207,7 @@ namespace HefestusApi.Migrations
                     Age = table.Column<int>(type: "integer", nullable: false),
                     CPF = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
-                    BirthDate = table.Column<string>(type: "text", nullable: true),
+                    BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IBGE = table.Column<string>(type: "text", nullable: true),
                     Razao = table.Column<string>(type: "text", nullable: true),
                     InscricaoEstadual = table.Column<string>(type: "text", nullable: true),

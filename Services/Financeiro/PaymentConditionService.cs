@@ -77,7 +77,9 @@ namespace HefestusApi.Services.Financeiro
                     var simpleDtos = paymentConditions.Select(c => new PaymentConditionSimpleSearchDataDto
                     {
                         Id = c.Id,
-                        Name = c.Name
+                        Name = c.Name,
+                        Installments = c.Installments,
+                        Interval = c.Interval
                     }).Cast<object>().ToList();
 
                     response.Data = simpleDtos;

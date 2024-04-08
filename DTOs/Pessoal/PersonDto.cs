@@ -38,7 +38,7 @@ public record struct PersonDto(
         int Age,
         string CPF,
         string Address,
-        string? BirthDate,
+        DateTime? BirthDate,
         string? IBGE,
         string? Razao,
         string? InscricaoEstadual,

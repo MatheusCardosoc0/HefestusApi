@@ -8,7 +8,7 @@ using HefestusApi.Models.Financeiro;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Models.Vendas;
 
-namespace HefestusApi.Services.Mapping
+namespace HefestusApi.DTOs.Mapping
 {
     public class MappingProfile : Profile
     {

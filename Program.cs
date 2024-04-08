@@ -22,6 +22,10 @@ using HefestusApi.Repositories.Financeiro.Interfaces;
 using HefestusApi.Services.Financeiro.Interfaces;
 using HefestusApi.Services.Financeiro;
 using HefestusApi.Repositories.Financeiro;
+using HefestusApi.Repositories.Vendas;
+using HefestusApi.Repositories.Vendas.Interfaces;
+using HefestusApi.Services.Vendas.Interfaces;
+using HefestusApi.Services.Vendas;
 
 namespace HefestusApi
 {
@@ -67,6 +71,9 @@ namespace HefestusApi
             //{
             //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             //});
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
             builder.Services.AddScoped<IPaymentOptionsRepository, PaymentOptionsRepository>();
             builder.Services.AddScoped<IPaymentOptionService, PaymentOptionService>();
 
@@ -111,11 +118,10 @@ namespace HefestusApi
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+           
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            
 
             app.UseHttpsRedirection();
             app.UseCors("MyCorsPolicy");

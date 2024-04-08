@@ -15,7 +15,7 @@ namespace HefestusApi.Models.Pessoal
         public int Age { get; set; }
         public string CPF { get; set; }
         public string Address { get; set; }
-        public string? BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string? IBGE { get; set; }
         public string? Razao { get; set; }
         public string? InscricaoEstadual { get; set; }
