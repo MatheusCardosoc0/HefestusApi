@@ -1,9 +1,9 @@
-﻿using HefestusApi.DTOs.Pessoal;
-using HefestusApi.Services.Pessoal.Interfaces;
+﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.Services.Administracao.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HefestusApi.Controllers.Pessoal
+namespace HefestusApi.Controllers.Administracao
 {
     //[Authorize]
     [Route("api/[controller]")]
@@ -29,7 +29,7 @@ namespace HefestusApi.Controllers.Pessoal
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
         public async Task<ActionResult> GetUserById(int id)
         {
             var serviceResponse = await _userService.GetUserByIdAsync(id);
@@ -69,18 +69,6 @@ namespace HefestusApi.Controllers.Pessoal
         public async Task<ActionResult> UpdateUser(int id, [FromBody] UserRequestDataDto request)
         {
             var serviceResponse = await _userService.UpdateUserAsync(id, request);
-            if (!serviceResponse.Success)
-            {
-                return BadRequest(serviceResponse.Message);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteUser(int id)
-        {
-            var serviceResponse = await _userService.DeleteUserAsync(id);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

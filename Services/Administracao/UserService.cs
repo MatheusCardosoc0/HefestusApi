@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using HefestusApi.DTOs.Pessoal;
-using HefestusApi.Models.Pessoal;
+using HefestusApi.DTOs.Administracao;
+using HefestusApi.Models.Administracao;
+using HefestusApi.Repositories.Administracao.Interfaces;
 using HefestusApi.Repositories.Interfaces;
-using HefestusApi.Repositories.Pessoal.Interfaces;
-using HefestusApi.Services.Pessoal.Interfaces;
+using HefestusApi.Services.Administracao.Interfaces;
 using HefestusApi.Utilities.functions;
 
-namespace HefestusApi.Services.Pessoal
+namespace HefestusApi.Services.Administracao
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
@@ -117,7 +117,7 @@ namespace HefestusApi.Services.Pessoal
 
                 var exisitingUser = await _userRepository.GetUserByNameAsync(request.Name);
 
-                if(exisitingUser != null)
+                if (exisitingUser != null)
                 {
                     response.Success = false;
                     response.Message = $"Já existe o usuário {request.Name} com esse nome!";
@@ -138,12 +138,14 @@ namespace HefestusApi.Services.Pessoal
                     return response;
                 }
 
+                int defaultSystemLocationId = 1; // Suponha que 1 seja o valor padrão
                 var user = new User
                 {
                     Name = request.Name,
                     Password = hashedPassword,
                     PersonId = request.PersonId,
                     Person = existingPerson,
+                    SystemLocationId = request.SystemLocationId ?? defaultSystemLocationId
                 };
 
                 await _userRepository.AddUserAsync(user);
@@ -175,8 +177,8 @@ namespace HefestusApi.Services.Pessoal
                     return response;
                 }
 
-               
-                if(userToUpdate.Name != request.Name)
+
+                if (userToUpdate.Name != request.Name)
                 {
                     response.Success = false;
                     response.Message = $"O nome do usuário não pode ser alterado";
@@ -184,7 +186,7 @@ namespace HefestusApi.Services.Pessoal
                 }
 
                 var existingPerson = await _userRepository.GetPersonAsync(request.PersonId);
-                if (existingPerson == null)
+                if (existingPerson == null )
                 {
                     response.Success = false;
                     response.Message = $"Pessoa com o ID {request.PersonId} não encontrada.";
@@ -202,6 +204,7 @@ namespace HefestusApi.Services.Pessoal
                 userToUpdate.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 userToUpdate.PersonId = request.PersonId;
                 userToUpdate.Person = existingPerson;
+                userToUpdate.SystemLocationId = request.SystemLocationId;
 
                 bool updateResult = await _userRepository.UpdateUserAsync(userToUpdate);
                 if (!updateResult)

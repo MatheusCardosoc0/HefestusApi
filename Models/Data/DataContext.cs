@@ -3,8 +3,9 @@ using HefestusApi.Models.Financeiro;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Models.Vendas;
 using Microsoft.EntityFrameworkCore;
+using HefestusApi.Models.Administracao;
 
-namespace HefestusApi.Repositories.Data
+namespace HefestusApi.Models.Data
 {
     public class DataContext : DbContext
     {
@@ -27,9 +28,18 @@ namespace HefestusApi.Repositories.Data
 
         public DbSet<OrderInstallment> OrderInstallment { get; set; }
 
+        public DbSet<Stock> Stock { get; set; }
+
+        public DbSet<SystemLocation> SystemLocation { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SystemLocation>()
+                .HasOne(s => s.Person)
+                .WithOne(p => p.SystemLocation)
+                .HasForeignKey<SystemLocation>(s => s.PersonId);
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Person)
                 .WithOne(p => p.User)
@@ -39,10 +49,30 @@ namespace HefestusApi.Repositories.Data
                 .HasIndex(u => u.Name)
                 .IsUnique();
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.DefaultLocation)
+                .WithMany(s => s.Users)
+                .HasForeignKey(s => s.SystemLocationId);
+
+            modelBuilder.Entity<Stock>()
+                .HasOne(s => s.Product)
+                .WithMany(p => p.Stocks)
+                .HasForeignKey(s => s.ProductId);
+
+            modelBuilder.Entity<Stock>()
+                .HasOne(s => s.SystemLocation)
+                .WithMany(p => p.Stocks)
+                .HasForeignKey(s => s.SystemLocationId);
+
             modelBuilder.Entity<Person>()
                 .HasOne(p => p.City)
                 .WithMany(c => c.Persons)
                 .HasForeignKey(p => p.CityId);
+
+            modelBuilder.Entity<Person>()
+                .HasOne(p => p.SystemLocation)
+                .WithOne(p => p.Person)
+                .HasForeignKey<Person>(p => p.SystemLocationId);
 
             modelBuilder.Entity<Person>()
                .HasOne(p => p.User)

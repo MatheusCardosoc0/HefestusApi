@@ -1,12 +1,7 @@
 ﻿using HefestusApi.DTOs.Financeiro;
-using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Financeiro;
-using HefestusApi.Repositories.Data;
 using HefestusApi.Services.Financeiro.Interfaces;
-using HefestusApi.Services.Materiais.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Financeiro
 {
@@ -33,7 +28,7 @@ namespace HefestusApi.Controllers.Financeiro
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
         public async Task<IActionResult> GetPaymentOptionById(int id)
         {
             var serviceResponse = await _paymentOptionsService.GetPaymentOptionByIdAsync(id);

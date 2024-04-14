@@ -5,13 +5,6 @@
         string Name,
         string? Description,
         float MinPriceSale,
-        decimal AverageCost,
-        float PromotionalPrice,
-        float PriceSale,
-        float BruteCost,
-        float LiquidCost,
-        float WholesalePrice,
-        float MinWholesalePrice,
         string? UrlImage,
         int NCM,
         string GTIN,
@@ -31,14 +24,14 @@
         int Id,
         string Name,
         string? Description,
-        float MinPriceSale,
+        decimal MinPriceSale,
         decimal AverageCost,
-        float PromotionalPrice,
-        float PriceSale,
-        float BruteCost,
-        float LiquidCost,
-        float WholesalePrice,
-        float MinWholesalePrice,
+        decimal PromotionalPrice,
+        decimal PriceSale,
+        decimal BruteCost,
+        decimal LiquidCost,
+        decimal WholesalePrice,
+        decimal MinWholesalePrice,
         string? UrlImage,
         int NCM,
         string GTIN,
@@ -48,14 +41,19 @@
         ProductSubGroupSimpleSearchDataDto SubGroup,
         string? Reference,
         string? Batch,
-        string UnitOfMensuration
+        string UnitOfMensuration,
+        int SystemLocationId,
+        float MinStock,
+        float MaxStock,
+        float CurrentStock,
+        string Location
     );
 
     public record struct ProductSimpleSearchDataDto (
         int Id,
         string Name,
-        float PriceSale,
-        float WholesalePrice
+        decimal PriceSale,
+        decimal WholesalePrice
     );
 }
 

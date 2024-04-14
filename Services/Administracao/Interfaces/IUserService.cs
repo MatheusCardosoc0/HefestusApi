@@ -1,8 +1,8 @@
-﻿using HefestusApi.DTOs.Pessoal;
-using HefestusApi.Models.Pessoal;
+﻿using HefestusApi.DTOs.Administracao;
+using HefestusApi.Models.Administracao;
 using HefestusApi.Utilities.functions;
 
-namespace HefestusApi.Services.Pessoal.Interfaces
+namespace HefestusApi.Services.Administracao.Interfaces
 {
     public interface IUserService
     {

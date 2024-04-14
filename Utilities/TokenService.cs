@@ -1,4 +1,4 @@
-﻿using HefestusApi.Models.Pessoal;
+﻿using HefestusApi.Models.Administracao;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,8 +18,10 @@ public class TokenService
         var claims = new[]
         {
             new Claim("userName", user.Name),
-            user.Person.UrlImage != null ? new Claim("UrlImage", user.Person.UrlImage) : null,
+            user.Person?.UrlImage != null ? new Claim("UrlImage", user.Person.UrlImage) : new Claim("UrlImage", "https://avatars.githubusercontent.com/u/35440139?v=4"),
             new Claim("id", user.Id.ToString()),
+            user.SystemLocationId != null ? new Claim("defaltLocationId", user.SystemLocationId.ToString()) : new Claim("defaltLocationId", null),
+            user.DefaultLocation?.Person.Name != null? new Claim("defaultLocarionName", user.DefaultLocation.Person.Name.ToString()) : new Claim("defaultLocarionName", null),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWTSettings:key"]));
@@ -71,7 +73,6 @@ public class TokenService
             ValidAudience = _config["JWTSettings:Audience"],
 
             ValidateLifetime = true,
-
         };
     }
 }

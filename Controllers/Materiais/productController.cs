@@ -1,14 +1,8 @@
-﻿using AutoMapper;
-using HefestusApi.DTOs.Pessoal;
-using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Pessoal;
-using HefestusApi.Models.Produtos;
-using HefestusApi.Repositories.Data;
+﻿using HefestusApi.DTOs.Produtos;
 using HefestusApi.Services.Materiais.Interfaces;
-using HefestusApi.Services.Pessoal.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace HefestusApi.Controllers.Produtos
 {
@@ -35,10 +29,10 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        public async Task<IActionResult> GetProductById(int id, string detailLevel, int locationId)
         {
-            var serviceResponse = await _productService.GetProductByIdAsync(id);
+            var serviceResponse = await _productService.GetProductByIdAsync(id, detailLevel, locationId);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -80,10 +74,10 @@ namespace HefestusApi.Controllers.Produtos
             return NoContent();
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<IActionResult> SearchProductByName(string searchTerm, string detailLevel)
+        [HttpGet("search/{detailLevel}/{searchTerm}/{locationId}")]
+        public async Task<IActionResult> SearchProductByName(string searchTerm, string detailLevel, int locationId)
         {
-            var serviceResponse = await _productService.SearchProductByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _productService.SearchProductByNameAsync(searchTerm, detailLevel, locationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

@@ -39,20 +39,33 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<Product>> GetProductByIdAsync(int id)
+        public async Task<ServiceResponse<object>> GetProductByIdAsync(int id, string detailLevel, int locationId)
         {
-            var response = new ServiceResponse<Product>();
+            var response = new ServiceResponse<object>();
             try
             {
                 var product = await _productRepository.GetProductByIdAsync(id);
-                if (product == null)
-                {
-                    response.Success = false;
-                    response.Message = "produto não encontrado.";
-                    return response;
-                }
 
-                response.Data = product;
+                if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
+                {
+                    var simpleDtos = new ProductSimpleSearchDataDto
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        PriceSale = product.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).PriceSale,
+                        WholesalePrice = product.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).WholesalePrice,
+                    };
+
+                    response.Data = simpleDtos;
+                }
+                else if (detailLevel.Equals("complete", StringComparison.OrdinalIgnoreCase))
+                {
+                    response.Data = product;
+                }
+                else
+                {
+                    throw new ArgumentException("Nível de detalhe não reconhecido. Use 'simple' ou 'complete'.");
+                }
             }
             catch (Exception ex)
             {
@@ -65,7 +78,7 @@ namespace HefestusApi.Services.Materiais
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductByNameAsync(string searchTerm, string detailLevel, int locationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
@@ -78,8 +91,8 @@ namespace HefestusApi.Services.Materiais
                     {
                         Id = c.Id,
                         Name = c.Name,
-                        PriceSale = c.PriceSale,
-                        WholesalePrice = c.WholesalePrice,
+                        PriceSale = c.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).PriceSale,
+                        WholesalePrice = c.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).WholesalePrice,
                     }).Cast<object>().ToList();
 
                     response.Data = simpleDtos;
@@ -103,38 +116,51 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<Product>> CreateProductAsync(ProductRequestDataDto request)
+        public async Task<ServiceResponse<Stock>> CreateProductAsync(ProductRequestDataDto request)
         {
-            var response = new ServiceResponse<Product>();
+            var response = new ServiceResponse<Stock>();
             try
             {
                 var product = new Product
                 {
                     Name = request.Name,
                     Description = request.Description,
-                    PriceSale = request.PriceSale,
-                    LiquidCost = request.LiquidCost,
-                    BruteCost = request.BruteCost,
                     GTIN = request.GTIN,
                     NCM = request.NCM,
-                    AverageCost = request.AverageCost,
                     Batch = request.Batch,
                     GTINtrib = request.GTINtrib,
-                    MinWholesalePrice = request.MinWholesalePrice,
-                    PromotionalPrice = request.PromotionalPrice,
                     Reference = request.Reference,
                     UrlImage = request.UrlImage,
-                    WholesalePrice = request.WholesalePrice,
-                    MinPriceSale = request.MinPriceSale,
                     UnitOfMensuration = request.UnitOfMensuration,
                     GroupId = request.Group.Id,
                     FamilyId = request.Family.Id,
                     SubgroupId = request.SubGroup.Id,
+                    
                 };
-
                 await _productRepository.AddProductAsync(product);
 
-                response.Data = product;
+                var stock = new Stock
+                {
+                    PriceSale = request.PriceSale,
+                    LiquidCost = request.LiquidCost,
+                    BruteCost = request.BruteCost,
+                    AverageCost = request.AverageCost,
+                    MinWholesalePrice = request.MinWholesalePrice,
+                    PromotionalPrice = request.PromotionalPrice,
+                    WholesalePrice = request.WholesalePrice,
+                    MinPriceSale = request.MinPriceSale,
+                    ProductId = product.Id,
+                    MinStock = request.MinStock,
+                    MaxStock = request.MaxStock,
+                    CurrentStock = request.CurrentStock,
+                    SystemLocationId = request.SystemLocationId,
+                    LastStockUpdate = new DateTime(),
+                    Location = request.Location
+                };
+                await _productRepository.AddStockAsync(stock);
+                await _productRepository.SaveChangesAsync();
+
+                response.Data = stock;
             }
             catch (Exception ex)
             {
@@ -162,28 +188,46 @@ namespace HefestusApi.Services.Materiais
 
                 product.Name = request.Name;
                 product.Description = request.Description;
-                product.PriceSale = request.PriceSale;
-                product.LiquidCost = request.LiquidCost;
-                product.BruteCost = request.BruteCost;
                 product.GTIN = request.GTIN;
                 product.NCM = request.NCM;
-                product.AverageCost = request.AverageCost;
                 product.Batch = request.Batch;
                 product.GTINtrib = request.GTINtrib;
-                product.MinWholesalePrice = request.MinWholesalePrice;
-                product.PromotionalPrice = request.PromotionalPrice;
                 product.Reference = request.Reference;
                 product.UrlImage = request.UrlImage;
-                product.WholesalePrice = request.WholesalePrice;
-                product.MinPriceSale = request.MinPriceSale;
                 product.UnitOfMensuration = request.UnitOfMensuration;
                 product.GroupId = request.Group.Id;
                 product.FamilyId = request.Family.Id;
                 product.SubgroupId = request.SubGroup.Id;
 
 
-                bool updateResult = await _productRepository.UpdateProductAsync(product);
-                if (!updateResult)
+                bool updateResultProduct = await _productRepository.UpdateProductAsync(product);
+
+                var stock = await _productRepository.GetSelectedStockAsync(request.SystemLocationId, id);
+                if (stock == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Estoque relacionado com o producto com ID {id} não foi encontrado.";
+                    return response;
+                }
+
+                stock.PriceSale = request.PriceSale;
+                stock.LiquidCost = request.LiquidCost;
+                stock.BruteCost = request.BruteCost;
+                stock.AverageCost = request.AverageCost;
+                stock.MinWholesalePrice = request.MinWholesalePrice;
+                stock.PromotionalPrice = request.PromotionalPrice;
+                stock.WholesalePrice = request.WholesalePrice;
+                stock.MinPriceSale = request.MinPriceSale;
+                stock.MaxStock = request.MaxStock;
+                stock.MinStock = request.MinStock;
+                stock.CurrentStock = request.CurrentStock;
+                stock.LastStockUpdate = new DateTime();
+                stock.Location = request.Location;
+
+                bool updateResultStock = await _productRepository.UpdateStockAsync(stock);
+                
+
+                if (!updateResultProduct || !updateResultStock)
                 {
                     throw new Exception("A atualização da produto falhou por uma razão desconhecida.");
                 }

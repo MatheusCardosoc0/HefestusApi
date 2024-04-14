@@ -1,6 +1,7 @@
-﻿using HefestusApi.Models.Pessoal;
+﻿using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Pessoal;
 
-namespace HefestusApi.Repositories.Pessoal.Interfaces
+namespace HefestusApi.Repositories.Administracao.Interfaces
 {
     public interface IUserRepository
     {

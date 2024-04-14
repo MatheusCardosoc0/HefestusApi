@@ -1,12 +1,7 @@
 ﻿using HefestusApi.DTOs.Produtos;
-using HefestusApi.Models.Pessoal;
-using HefestusApi.Models.Produtos;
-using HefestusApi.Repositories.Data;
 using HefestusApi.Services.Materiais.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.Produtos
 {
@@ -33,7 +28,7 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
         public async Task<IActionResult> GetProductSubGroupById(int id)
         {
             var serviceResponse = await _productSubGroupService.GetProductSubGroupByIdAsync(id);

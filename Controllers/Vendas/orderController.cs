@@ -29,7 +29,7 @@ namespace HefestusApi.Controllers.Vendas
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
         public async Task<ActionResult> GetOrderById(int id)
         {
             var serviceResponse = await _orderService.GetOrderByIdAsync(id);

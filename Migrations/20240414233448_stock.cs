@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class primeiro : Migration
+    public partial class stock : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -113,18 +113,17 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "SystemLocation",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    PersonId = table.Column<int>(type: "integer", nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    PersonId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_SystemLocation", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,14 +134,6 @@ namespace HefestusApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    MinPriceSale = table.Column<float>(type: "real", nullable: false),
-                    AverageCost = table.Column<decimal>(type: "numeric", nullable: false),
-                    PromotionalPrice = table.Column<float>(type: "real", nullable: false),
-                    PriceSale = table.Column<float>(type: "real", nullable: false),
-                    BruteCost = table.Column<float>(type: "real", nullable: false),
-                    LiquidCost = table.Column<float>(type: "real", nullable: false),
-                    WholesalePrice = table.Column<float>(type: "real", nullable: false),
-                    MinWholesalePrice = table.Column<float>(type: "real", nullable: false),
                     UrlImage = table.Column<string>(type: "text", nullable: true),
                     NCM = table.Column<int>(type: "integer", nullable: false),
                     GTIN = table.Column<string>(type: "text", nullable: false),
@@ -196,22 +187,83 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    PersonId = table.Column<int>(type: "integer", nullable: true),
+                    SystemLocationId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_SystemLocation_SystemLocationId",
+                        column: x => x.SystemLocationId,
+                        principalTable: "SystemLocation",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Stock",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    CurrentStock = table.Column<float>(type: "real", nullable: false),
+                    MinStock = table.Column<float>(type: "real", nullable: false),
+                    MaxStock = table.Column<float>(type: "real", nullable: false),
+                    UnitCost = table.Column<decimal>(type: "numeric", nullable: false),
+                    AverageCost = table.Column<decimal>(type: "numeric", nullable: false),
+                    PromotionalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    PriceSale = table.Column<decimal>(type: "numeric", nullable: false),
+                    BruteCost = table.Column<decimal>(type: "numeric", nullable: false),
+                    LiquidCost = table.Column<decimal>(type: "numeric", nullable: false),
+                    WholesalePrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    MinPriceSale = table.Column<decimal>(type: "numeric", nullable: false),
+                    MinWholesalePrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    SystemLocationId = table.Column<int>(type: "integer", nullable: false),
+                    Location = table.Column<string>(type: "text", nullable: true),
+                    LastStockUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stock_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Stock_SystemLocation_SystemLocationId",
+                        column: x => x.SystemLocationId,
+                        principalTable: "SystemLocation",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Person",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Phone = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    Phone = table.Column<string>(type: "text", nullable: true),
                     Age = table.Column<int>(type: "integer", nullable: false),
-                    CPF = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
+                    CPF = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: true),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IBGE = table.Column<string>(type: "text", nullable: true),
                     Razao = table.Column<string>(type: "text", nullable: true),
                     InscricaoEstadual = table.Column<string>(type: "text", nullable: true),
-                    CEP = table.Column<string>(type: "text", nullable: false),
+                    CEP = table.Column<string>(type: "text", nullable: true),
                     UrlImage = table.Column<string>(type: "text", nullable: true),
                     IsBlocked = table.Column<bool>(type: "boolean", nullable: true),
                     MaritalStatus = table.Column<string>(type: "text", nullable: true),
@@ -222,6 +274,7 @@ namespace HefestusApi.Migrations
                     PersonType = table.Column<string>(type: "text", nullable: false),
                     CityId = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true),
+                    SystemLocationId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<string>(type: "text", nullable: false),
                     LastModifiedAt = table.Column<string>(type: "text", nullable: false)
                 },
@@ -234,6 +287,11 @@ namespace HefestusApi.Migrations
                         principalTable: "Cities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Person_SystemLocation_SystemLocationId",
+                        column: x => x.SystemLocationId,
+                        principalTable: "SystemLocation",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Person_Users_UserId",
                         column: x => x.UserId,
@@ -428,6 +486,12 @@ namespace HefestusApi.Migrations
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Person_SystemLocationId",
+                table: "Person",
+                column: "SystemLocationId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Person_UserId",
                 table: "Person",
                 column: "UserId",
@@ -499,10 +563,25 @@ namespace HefestusApi.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Stock_ProductId",
+                table: "Stock",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stock_SystemLocationId",
+                table: "Stock",
+                column: "SystemLocationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Name",
                 table: "Users",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_SystemLocationId",
+                table: "Users",
+                column: "SystemLocationId");
         }
 
         /// <inheritdoc />
@@ -518,13 +597,16 @@ namespace HefestusApi.Migrations
                 name: "PersonPersonGroup");
 
             migrationBuilder.DropTable(
+                name: "Stock");
+
+            migrationBuilder.DropTable(
                 name: "Order");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "PersonGroup");
 
             migrationBuilder.DropTable(
-                name: "PersonGroup");
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "PaymentCondition");
@@ -549,6 +631,9 @@ namespace HefestusApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "SystemLocation");
         }
     }
 }

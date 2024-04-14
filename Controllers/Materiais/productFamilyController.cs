@@ -28,7 +28,7 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{detailLevel}/{id}/{locationId}")]
         public async Task<IActionResult> GetProductFamilyById(int id)
         {
             var serviceResponse = await _productFamilyService.GetProductFamilyByIdAsync(id);

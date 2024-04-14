@@ -1,7 +1,7 @@
-﻿using HefestusApi.Models.Pessoal;
+﻿using HefestusApi.Models.Data;
+using HefestusApi.Models.Pessoal;
 using HefestusApi.Models.Produtos;
 using HefestusApi.Models.Vendas;
-using HefestusApi.Repositories.Data;
 using HefestusApi.Repositories.Vendas.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

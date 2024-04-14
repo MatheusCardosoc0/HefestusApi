@@ -1,5 +1,4 @@
 using Api.Utilities;
-using HefestusApi.Repositories.Data;
 using HefestusApi.Services.Interfaces;
 using HefestusApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,6 +25,11 @@ using HefestusApi.Repositories.Vendas;
 using HefestusApi.Repositories.Vendas.Interfaces;
 using HefestusApi.Services.Vendas.Interfaces;
 using HefestusApi.Services.Vendas;
+using HefestusApi.Models.Data;
+using HefestusApi.Repositories.Administracao.Interfaces;
+using HefestusApi.Repositories.Administracao;
+using HefestusApi.Services.Administracao.Interfaces;
+using HefestusApi.Services.Administracao;
 
 namespace HefestusApi
 {
@@ -55,7 +59,7 @@ namespace HefestusApi
 
             // Add services to the container.
             builder.Services.AddDbContext<DataContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DBConnection")));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DBConnection")));
 
             builder.Services.AddCors(options =>
             {
@@ -67,10 +71,14 @@ namespace HefestusApi
                 });
             });
 
-            //builder.Services.AddControllers().AddJsonOptions(options =>
-            //{
-            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            //});
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
+
+            builder.Services.AddScoped<ISystemLocationRepository, SystemLocationRepository>();
+            builder.Services.AddScoped<ISystemLocationService, SystemLocationService>();
+
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 

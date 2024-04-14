@@ -1,5 +1,5 @@
-﻿using HefestusApi.Models.Financeiro;
-using HefestusApi.Repositories.Data;
+﻿using HefestusApi.Models.Data;
+using HefestusApi.Models.Financeiro;
 using HefestusApi.Repositories.Financeiro.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

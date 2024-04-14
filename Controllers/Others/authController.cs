@@ -1,5 +1,5 @@
-﻿using HefestusApi.Models.Pessoal;
-using HefestusApi.Repositories.Data;
+﻿using HefestusApi.Models.Data;
+using HefestusApi.Models.Pessoal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,9 +1,10 @@
-﻿using HefestusApi.Models.Pessoal;
-using HefestusApi.Repositories.Data;
-using HefestusApi.Repositories.Pessoal.Interfaces;
+﻿using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Data;
+using HefestusApi.Models.Pessoal;
+using HefestusApi.Repositories.Administracao.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace HefestusApi.Repositories.Pessoal
+namespace HefestusApi.Repositories.Administracao
 {
     public class UserRepository : IUserRepository
     {
@@ -17,7 +18,7 @@ namespace HefestusApi.Repositories.Pessoal
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _context.Users
-                .Include(x => x.Person) 
+                .Include(x => x.Person)
                 .ToListAsync();
         }
 
