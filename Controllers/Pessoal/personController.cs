@@ -30,7 +30,7 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
         public async Task<IActionResult> GetPersonById(int id)
         {
             var serviceResponse = await _personService.GetPersonByIdAsync(id);

@@ -135,7 +135,7 @@ namespace HefestusApi.Services.Materiais
                     GroupId = request.Group.Id,
                     FamilyId = request.Family.Id,
                     SubgroupId = request.SubGroup.Id,
-                    
+
                 };
                 await _productRepository.AddProductAsync(product);
 
@@ -165,7 +165,7 @@ namespace HefestusApi.Services.Materiais
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Erro ao criar a produto: {ex.Message}";
+                response.Message = $"Erro ao criar a produto: {ex}";
                 return response;
             }
 
@@ -225,7 +225,7 @@ namespace HefestusApi.Services.Materiais
                 stock.Location = request.Location;
 
                 bool updateResultStock = await _productRepository.UpdateStockAsync(stock);
-                
+
 
                 if (!updateResultProduct || !updateResultStock)
                 {

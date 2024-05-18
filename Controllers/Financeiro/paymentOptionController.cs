@@ -28,7 +28,7 @@ namespace HefestusApi.Controllers.Financeiro
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
         public async Task<IActionResult> GetPaymentOptionById(int id)
         {
             var serviceResponse = await _paymentOptionsService.GetPaymentOptionByIdAsync(id);
@@ -47,7 +47,7 @@ namespace HefestusApi.Controllers.Financeiro
             {
                 return BadRequest(serviceResponse.Message);
             }
-           
+
             return CreatedAtAction(nameof(GetPaymentOptionById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
         }
 

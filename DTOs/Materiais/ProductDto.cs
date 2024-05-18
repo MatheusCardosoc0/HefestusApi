@@ -46,10 +46,10 @@
         float MinStock,
         float MaxStock,
         float CurrentStock,
-        string Location
+        string? Location
     );
 
-    public record struct ProductSimpleSearchDataDto (
+    public record struct ProductSimpleSearchDataDto(
         int Id,
         string Name,
         decimal PriceSale,

@@ -13,15 +13,15 @@ namespace HefestusApi.Models.Produtos
         [StringLength(100, ErrorMessage = "A descrição não pode exceder 100 caracteres.")]
         public string? Description { get; set; }
         public string? UrlImage { get; set; }
-        public required int NCM { get; set; }
-        public required string GTIN { get; set; } = "Sem GTIN";
+        public int NCM { get; set; }
+        public string GTIN { get; set; } = "Sem GTIN";
         public string? GTINtrib { get; set; }
         public int FamilyId { get; set; }
         public int GroupId { get; set; }
         public int SubgroupId { get; set; }
         public string? Reference { get; set; }
         public string? Batch { get; set; }
-        public required string UnitOfMensuration { get; set; }
+        public string UnitOfMensuration { get; set; }
 
         public ProductFamily Family { get; set; }
         public ProductGroup Group { get; set; }
@@ -53,7 +53,7 @@ namespace HefestusApi.Models.Produtos
         public decimal MinWholesalePrice { get; set; }
         public int SystemLocationId { get; set; }
         public SystemLocation SystemLocation { get; set; }
-        public string? Location { get; set; }
+        public string Location { get; set; }
         public DateTime? LastStockUpdate { get; set; }
     }
 }

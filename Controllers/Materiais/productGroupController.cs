@@ -31,8 +31,8 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
-        public async Task<IActionResult> GetProductGroupById(int id)
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
+        public async Task<IActionResult> GetProductGroupById(int id, int locationId, string detailLevel )
         {
             var serviceResponse = await _productGroupService.GetProductGroupByIdAsync(id);
             if (!serviceResponse.Success)

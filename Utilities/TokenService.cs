@@ -15,14 +15,19 @@ public class TokenService
 
     public string GenerateToken(User user)
     {
-        var claims = new[]
+        var claims = new List<Claim>
+    {
+        new Claim("userName", user.Name),
+        new Claim("UrlImage", user.Person?.UrlImage ?? "https://avatars.githubusercontent.com/u/35440139?v=4"),
+        new Claim("id", user.Id.ToString()),
+        new Claim("defaltLocationId", user.SystemLocationId?.ToString() ?? "defaultLocationId"),
+    };
+
+        // Adicionar apenas se não for nulo
+        if (user.DefaultLocation?.Person?.Name != null)
         {
-            new Claim("userName", user.Name),
-            user.Person?.UrlImage != null ? new Claim("UrlImage", user.Person.UrlImage) : new Claim("UrlImage", "https://avatars.githubusercontent.com/u/35440139?v=4"),
-            new Claim("id", user.Id.ToString()),
-            user.SystemLocationId != null ? new Claim("defaltLocationId", user.SystemLocationId.ToString()) : new Claim("defaltLocationId", null),
-            user.DefaultLocation?.Person.Name != null? new Claim("defaultLocarionName", user.DefaultLocation.Person.Name.ToString()) : new Claim("defaultLocarionName", null),
-        };
+            claims.Add(new Claim("defaultLocationName", user.DefaultLocation.Person.Name));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWTSettings:key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

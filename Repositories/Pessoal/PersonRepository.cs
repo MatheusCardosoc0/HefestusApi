@@ -32,6 +32,7 @@ namespace HefestusApi.Repositories.Pessoal
             return await _context.Person
                 .Include(p => p.City)
                 .Include(p => p.PersonGroup)
+                .OrderBy(p => p.Name)
                 .ToListAsync();
         }
 
@@ -48,7 +49,7 @@ namespace HefestusApi.Repositories.Pessoal
             return await _context.Person
                 .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
                 .Include(p => p.City)
-                .Include(p => p.PersonGroup)    
+                .Include(p => p.PersonGroup)
                 .ToListAsync();
         }
 

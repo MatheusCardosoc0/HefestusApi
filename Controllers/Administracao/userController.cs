@@ -29,7 +29,7 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
         public async Task<ActionResult> GetUserById(int id)
         {
             var serviceResponse = await _userService.GetUserByIdAsync(id);
@@ -62,7 +62,9 @@ namespace HefestusApi.Controllers.Administracao
                 return BadRequest(serviceResponse.Message);
             }
 
-            return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id }, serviceResponse?.Data);
+            //return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id }, serviceResponse?.Data);
+            return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id, detailLevel = "complete", locationId = (int?)null }, serviceResponse?.Data);
+
         }
 
         [HttpPut("{id}")]

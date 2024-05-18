@@ -2,15 +2,21 @@
 {
     public record struct PersonGroupDto(
         int Id,
-        string Name
+        string Name,
+        DateTime CreatedAt,
+        DateTime LastModifiedAt
         );
 
     public record struct PersonGroupRequestDataDto(
-       string Name
+       string Name,
+       DateTime CreatedAt,
+       DateTime LastModifiedAt
        );
 
     public record struct PersonGroupSimpleSearchDataDto(
         int Id,
-        string Name
+        string Name,
+        DateTime CreatedAt,
+        DateTime LastModifiedAt
         );
 }

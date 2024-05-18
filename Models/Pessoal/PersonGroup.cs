@@ -8,7 +8,10 @@ namespace HefestusApi.Models.Pessoal
         public string Name { get; set; }
         [JsonIgnore]
         public List<Person> Persons { get; set; }
-        public string CreatedAt { get; private set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        public string LastModifiedAt { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; private set; } = DateTime.UtcNow;
+
+        // Métodos para atualizar datas
+        public void UpdateLastModified() => LastModifiedAt = DateTime.UtcNow;
     }
 }

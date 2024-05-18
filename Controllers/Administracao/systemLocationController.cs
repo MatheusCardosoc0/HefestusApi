@@ -28,7 +28,7 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
         public async Task<ActionResult> GetSystemLocationById(int id)
         {
             var serviceResponse = await _systemLocationService.GetSystemLocationByIdAsync(id);

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HefestusApi.DTOs.Administracao;
 using HefestusApi.Models.Administracao;
+using HefestusApi.Models.Pessoal;
 using HefestusApi.Repositories.Administracao.Interfaces;
 using HefestusApi.Repositories.Interfaces;
 using HefestusApi.Services.Administracao.Interfaces;
@@ -113,49 +114,33 @@ namespace HefestusApi.Services.Administracao
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-                var existingPerson = await _userRepository.GetPersonAsync(request.PersonId);
-
-                var exisitingUser = await _userRepository.GetUserByNameAsync(request.Name);
-
-                if (exisitingUser != null)
+                var existingUser = await _userRepository.GetUserByNameAsync(request.Name);
+                if (existingUser != null)
                 {
                     response.Success = false;
                     response.Message = $"Já existe o usuário {request.Name} com esse nome!";
                     return response;
                 }
 
-                if (existingPerson == null)
-                {
-                    response.Success = false;
-                    response.Message = $"Pessoa com o id {request.PersonId} não encontrada!";
-                    return response;
-                }
-
-                if (existingPerson.User != null)
-                {
-                    response.Success = false;
-                    response.Message = $"Pessoa com o id {request.PersonId} já tem um usuário!";
-                    return response;
-                }
-
-                int defaultSystemLocationId = 1; // Suponha que 1 seja o valor padrão
-                var user = new User
+                User user = new User
                 {
                     Name = request.Name,
                     Password = hashedPassword,
-                    PersonId = request.PersonId,
-                    Person = existingPerson,
-                    SystemLocationId = request.SystemLocationId ?? defaultSystemLocationId
+                    PersonId = request.PersonId, // Será nulo se não fornecido
+                    Person = request.PersonId != null ? await _userRepository.GetPersonAsync(request.PersonId) : null,
+                    SystemLocationId = request.SystemLocationId // Será nulo se não fornecido
                 };
 
                 await _userRepository.AddUserAsync(user);
 
                 response.Data = user;
+                response.Success = true;
+                response.Message = "Usuário criado com sucesso!";
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Erro ao criar a usuário: {ex.Message}";
+                response.Message = $"Erro ao criar o usuário: {ex.Message}";
                 return response;
             }
 

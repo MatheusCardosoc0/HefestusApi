@@ -22,14 +22,14 @@ namespace HefestusApi.Services
             try
             {
                 var personGroups = await _personGroupRepository.GetAllPersonGroupsAsync();
-                var personGroupDtos = personGroups.Select(c => new PersonGroupDto { Id = c.Id, Name = c.Name });
+                var personGroupDtos = personGroups.Select(c => new PersonGroupDto { Id = c.Id, Name = c.Name, CreatedAt = c.CreatedAt, LastModifiedAt = c.LastModifiedAt });
 
                 response.Data = personGroupDtos;
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = "Ocorreu um erro ao tentar obter todas as grupo de pessoas: " + ex.Message;
+                response.Message = "Ocorreu um erro ao tentar obter todas as grupo de pessoas: " + ex;
                 return response;
             }
 
@@ -105,7 +105,7 @@ namespace HefestusApi.Services
             {
                 var personGroup = new PersonGroup
                 {
-                    Name = request.Name,
+                    Name = request.Name
                 };
 
                 await _personGroupRepository.AddPersonGroupAsync(personGroup);
@@ -115,7 +115,7 @@ namespace HefestusApi.Services
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Erro ao criar a grupo de pessoas: {ex.Message}";
+                response.Message = $"Erro ao criar a grupo de pessoas: {ex}";
                 return response;
             }
 

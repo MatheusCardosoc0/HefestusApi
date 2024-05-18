@@ -28,7 +28,7 @@ namespace HefestusApi.Controllers.Financeiro
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{id}/{locationId}")]
+        [HttpGet("{detailLevel}/{locationId}/{id}")]
         public async Task<IActionResult> GetPaymentConditionById(int id)
         {
             var serviceResponse = await _paymentConditionService.GetPaymentConditionByIdAsync(id);
