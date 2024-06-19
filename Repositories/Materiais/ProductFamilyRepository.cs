@@ -14,23 +14,23 @@ namespace HefestusApi.Repositories.Materiais
             _context = context;
         }
 
-        public async Task<IEnumerable<ProductFamily>> GetAllProductFamiliesAsync()
+        public async Task<IEnumerable<ProductFamily>> GetAllProductFamiliesAsync(string SystemLocationId)
         {
             return await _context.ProductFamily
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<ProductFamily?> GetProductFamilyByIdAsync(int id)
+        public async Task<ProductFamily?> GetProductFamilyByIdAsync(string SystemLocationId, int id)
         {
             return await _context.ProductFamily
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<ProductFamily>> SearchProductFamilyByNameAsync(string searchTerm)
+        public async Task<IEnumerable<ProductFamily>> SearchProductFamilyByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.ProductFamily
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
-                .ToListAsync();
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> AddProductFamilyAsync(ProductFamily productFamily)

@@ -16,12 +16,12 @@ namespace HefestusApi.Services
             _personGroupRepository = personGroupRepository;
         }
 
-        public async Task<ServiceResponse<IEnumerable<PersonGroupDto>>> GetAllPersonGroupsAsync()
+        public async Task<ServiceResponse<IEnumerable<PersonGroupDto>>> GetAllPersonGroupsAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<PersonGroupDto>>();
             try
             {
-                var personGroups = await _personGroupRepository.GetAllPersonGroupsAsync();
+                var personGroups = await _personGroupRepository.GetAllPersonGroupsAsync(SystemLocationId);
                 var personGroupDtos = personGroups.Select(c => new PersonGroupDto { Id = c.Id, Name = c.Name, CreatedAt = c.CreatedAt, LastModifiedAt = c.LastModifiedAt });
 
                 response.Data = personGroupDtos;
@@ -36,12 +36,12 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<PersonGroup>> GetPersonGroupByIdAsync(int id)
+        public async Task<ServiceResponse<PersonGroup>> GetPersonGroupByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<PersonGroup>();
             try
             {
-                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(id);
+                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(SystemLocationId, id);
                 if (personGroup == null)
                 {
                     response.Success = false;
@@ -62,12 +62,12 @@ namespace HefestusApi.Services
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchPersonGroupByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchPersonGroupByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var personGroups = await _personGroupRepository.SearchPersonGroupByNameAsync(searchTerm.ToLower());
+                var personGroups = await _personGroupRepository.SearchPersonGroupByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -98,14 +98,15 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<PersonGroup>> CreatePersonGroupAsync(PersonGroupRequestDataDto request)
+        public async Task<ServiceResponse<PersonGroup>> CreatePersonGroupAsync(PersonGroupRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<PersonGroup>();
             try
             {
                 var personGroup = new PersonGroup
                 {
-                    Name = request.Name
+                    Name = request.Name,
+                    SystemLocationId = SystemLocationId
                 };
 
                 await _personGroupRepository.AddPersonGroupAsync(personGroup);
@@ -123,12 +124,12 @@ namespace HefestusApi.Services
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdatePersonGroupAsync(int id, PersonGroupRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdatePersonGroupAsync(int id, PersonGroupRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(id);
+                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(SystemLocationId, id);
                 if (personGroup == null)
                 {
                     response.Success = false;
@@ -137,6 +138,7 @@ namespace HefestusApi.Services
                 }
 
                 personGroup.Name = request.Name;
+                personGroup.SystemLocationId = SystemLocationId;
 
                 bool updateResult = await _personGroupRepository.UpdatePersonGroupAsync(personGroup);
                 if (!updateResult)
@@ -156,12 +158,12 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeletePersonGroupAsync(int id)
+        public async Task<ServiceResponse<bool>> DeletePersonGroupAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(id);
+                var personGroup = await _personGroupRepository.GetPersonGroupByIdAsync(SystemLocationId, id);
 
                 if (personGroup == null)
                 {

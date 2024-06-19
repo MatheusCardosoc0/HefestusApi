@@ -20,12 +20,12 @@ namespace HefestusApi.Services.Administracao
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUsersAsync()
+        public async Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUsersAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<UserDto>>();
             try
             {
-                var users = await _userRepository.GetAllUsersAsync();
+                var users = await _userRepository.GetAllUsersAsync(SystemLocationId);
 
                 var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
 
@@ -41,12 +41,12 @@ namespace HefestusApi.Services.Administracao
             return response;
         }
 
-        public async Task<ServiceResponse<UserDto>> GetUserByIdAsync(int id)
+        public async Task<ServiceResponse<UserDto>> GetUserByIdAsync(string SystemLocationId, string id)
         {
             var response = new ServiceResponse<UserDto>();
             try
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
+                var user = await _userRepository.GetUserByIdAsync(SystemLocationId, id);
                 if (user == null)
                 {
                     response.Success = false;
@@ -69,12 +69,12 @@ namespace HefestusApi.Services.Administracao
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchUserByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchUserByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var users = await _userRepository.SearchUserByNameAsync(searchTerm.ToLower());
+                var users = await _userRepository.SearchUserByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -107,14 +107,14 @@ namespace HefestusApi.Services.Administracao
             return response;
         }
 
-        public async Task<ServiceResponse<User>> CreateUserAsync(UserRequestDataDto request)
+        public async Task<ServiceResponse<User>> CreateUserAsync(UserRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<User>();
             try
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-                var existingUser = await _userRepository.GetUserByNameAsync(request.Name);
+                var existingUser = await _userRepository.GetUserByNameAsync(request.Name, SystemLocationId);
                 if (existingUser != null)
                 {
                     response.Success = false;
@@ -126,9 +126,9 @@ namespace HefestusApi.Services.Administracao
                 {
                     Name = request.Name,
                     Password = hashedPassword,
-                    PersonId = request.PersonId, // Será nulo se não fornecido
-                    Person = request.PersonId != null ? await _userRepository.GetPersonAsync(request.PersonId) : null,
-                    SystemLocationId = request.SystemLocationId // Será nulo se não fornecido
+                    PersonId = request.PersonId, 
+                    Person = await _userRepository.GetPersonAsync(request.SystemLocationId, request.PersonId),
+                    SystemLocationId = request.SystemLocationId 
                 };
 
                 await _userRepository.AddUserAsync(user);
@@ -148,12 +148,12 @@ namespace HefestusApi.Services.Administracao
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdateUserAsync(int id, UserRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateUserAsync( string id, UserRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var userToUpdate = await _userRepository.GetUserByIdAsync(id);
+                var userToUpdate = await _userRepository.GetUserByIdAsync(SystemLocationId, id);
 
                 if (userToUpdate == null)
                 {
@@ -170,7 +170,7 @@ namespace HefestusApi.Services.Administracao
                     return response;
                 }
 
-                var existingPerson = await _userRepository.GetPersonAsync(request.PersonId);
+                var existingPerson = await _userRepository.GetPersonAsync(request.SystemLocationId, request.PersonId);
                 if (existingPerson == null )
                 {
                     response.Success = false;
@@ -209,12 +209,12 @@ namespace HefestusApi.Services.Administracao
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteUserAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteUserAsync(string SystemLocationId, string id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
+                var user = await _userRepository.GetUserByIdAsync(SystemLocationId, id);
 
                 if (user == null)
                 {

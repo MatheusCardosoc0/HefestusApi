@@ -22,6 +22,7 @@ namespace HefestusApi.Models.Produtos
         public string? Reference { get; set; }
         public string? Batch { get; set; }
         public string UnitOfMensuration { get; set; }
+        public string SystemLocationId { get; set; }
 
         public ProductFamily Family { get; set; }
         public ProductGroup Group { get; set; }
@@ -31,6 +32,12 @@ namespace HefestusApi.Models.Produtos
         public List<OrderProduct>? OrderProducts { get; set; }
 
         public List<Stock> Stocks { get; set; }
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; private set; } = DateTime.UtcNow;
+
+        // Métodos para atualizar datas
+        public void UpdateLastModified() => LastModifiedAt = DateTime.UtcNow;
     }
 
     public class Stock
@@ -51,9 +58,15 @@ namespace HefestusApi.Models.Produtos
         public decimal WholesalePrice { get; set; }
         public decimal MinPriceSale { get; set; }
         public decimal MinWholesalePrice { get; set; }
-        public int SystemLocationId { get; set; }
-        public SystemLocation SystemLocation { get; set; }
+        public int SubLocationId { get; set; }
+        public SubLocation SubLocation { get; set; }
         public string Location { get; set; }
         public DateTime? LastStockUpdate { get; set; }
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; private set; } = DateTime.UtcNow;
+
+        // Métodos para atualizar datas
+        public void UpdateLastModified() => LastModifiedAt = DateTime.UtcNow;
     }
 }

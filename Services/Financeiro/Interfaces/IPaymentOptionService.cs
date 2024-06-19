@@ -6,11 +6,11 @@ namespace HefestusApi.Services.Financeiro.Interfaces
 {
     public interface IPaymentOptionService
     {
-        Task<ServiceResponse<IEnumerable<PaymentOptionDto>>> GetAllPaymentOptionsAsync();
-        Task<ServiceResponse<PaymentOptions>> GetPaymentOptionByIdAsync(int id);
-        Task<ServiceResponse<IEnumerable<object>>> SearchPaymentOptionByNameAsync(string searchTerm, string detailLevel);
-        Task<ServiceResponse<PaymentOptions>> CreatePaymentOptionAsync(PaymentOptionRequestDataDto request);
-        Task<ServiceResponse<bool>> UpdatePaymentOptionAsync(int id, PaymentOptionRequestDataDto request);
-        Task<ServiceResponse<bool>> DeletePaymentOptionAsync(int id);
+        Task<ServiceResponse<IEnumerable<PaymentOptionDto>>> GetAllPaymentOptionsAsync(string SystemLocationId);
+        Task<ServiceResponse<PaymentOptions>> GetPaymentOptionByIdAsync(string SystemLocationId, int id);
+        Task<ServiceResponse<IEnumerable<object>>> SearchPaymentOptionByNameAsync(string searchTerm, string detailLevel, string SystemLocationId);
+        Task<ServiceResponse<PaymentOptions>> CreatePaymentOptionAsync(PaymentOptionRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> UpdatePaymentOptionAsync( int id, PaymentOptionRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> DeletePaymentOptionAsync(string SystemLocationId, int id);
     }
 }

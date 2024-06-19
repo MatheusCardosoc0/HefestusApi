@@ -18,12 +18,12 @@ namespace HefestusApi.Services.Financeiro
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<PaymentConditionDto>>> GetAllPaymentConditionsAsync()
+        public async Task<ServiceResponse<IEnumerable<PaymentConditionDto>>> GetAllPaymentConditionsAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<PaymentConditionDto>>();
             try
             {
-                var paymentConditions = await _paymentConditionRepository.GetAllPaymentConditionsAsync();
+                var paymentConditions = await _paymentConditionRepository.GetAllPaymentConditionsAsync(SystemLocationId);
 
                 var paymentConditionDtos = _mapper.Map<IEnumerable<PaymentConditionDto>>(paymentConditions);
 
@@ -39,12 +39,12 @@ namespace HefestusApi.Services.Financeiro
             return response;
         }
 
-        public async Task<ServiceResponse<PaymentCondition>> GetPaymentConditionByIdAsync(int id)
+        public async Task<ServiceResponse<PaymentCondition>> GetPaymentConditionByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<PaymentCondition>();
             try
             {
-                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(id);
+                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(SystemLocationId, id);
                 if (paymentCondition == null)
                 {
                     response.Success = false;
@@ -65,12 +65,12 @@ namespace HefestusApi.Services.Financeiro
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchPaymentConditionByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchPaymentConditionByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var paymentConditions = await _paymentConditionRepository.SearchPaymentConditionByNameAsync(searchTerm.ToLower());
+                var paymentConditions = await _paymentConditionRepository.SearchPaymentConditionByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -103,7 +103,7 @@ namespace HefestusApi.Services.Financeiro
             return response;
         }
 
-        public async Task<ServiceResponse<PaymentCondition>> CreatePaymentConditionAsync(PaymentConditionRequestDataDto request)
+        public async Task<ServiceResponse<PaymentCondition>> CreatePaymentConditionAsync(PaymentConditionRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<PaymentCondition>();
             try
@@ -113,6 +113,7 @@ namespace HefestusApi.Services.Financeiro
                     Name = request.Name,
                     Installments = request.Installments,
                     Interval = request.Interval,
+                    SystemLocationId = SystemLocationId
                 };
 
                 await _paymentConditionRepository.AddPaymentConditionAsync(paymentCondition);
@@ -130,12 +131,12 @@ namespace HefestusApi.Services.Financeiro
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdatePaymentConditionAsync(int id, PaymentConditionRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdatePaymentConditionAsync(int id, PaymentConditionRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(id);
+                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(SystemLocationId, id);
                 if (paymentCondition == null)
                 {
                     response.Success = false;
@@ -146,6 +147,7 @@ namespace HefestusApi.Services.Financeiro
                 paymentCondition.Name = request.Name;
                 paymentCondition.Installments = request.Installments;
                 paymentCondition.Interval = request.Interval;
+                paymentCondition.SystemLocationId = SystemLocationId;
 
                 bool updateResult = await _paymentConditionRepository.UpdatePaymentConditionAsync(paymentCondition);
                 if (!updateResult)
@@ -165,12 +167,12 @@ namespace HefestusApi.Services.Financeiro
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeletePaymentConditionAsync(int id)
+        public async Task<ServiceResponse<bool>> DeletePaymentConditionAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(id);
+                var paymentCondition = await _paymentConditionRepository.GetPaymentConditionByIdAsync(SystemLocationId, id);
 
                 if (paymentCondition == null)
                 {

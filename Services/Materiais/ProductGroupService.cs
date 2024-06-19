@@ -18,12 +18,12 @@ namespace HefestusApi.Services.Materiais
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<ProductGroupDto>>> GetAllProductGroupsAsync()
+        public async Task<ServiceResponse<IEnumerable<ProductGroupDto>>> GetAllProductGroupsAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<ProductGroupDto>>();
             try
             {
-                var productGroups = await _productGroupRepository.GetAllProductGroupsAsync();
+                var productGroups = await _productGroupRepository.GetAllProductGroupsAsync(SystemLocationId);
 
                 var productGroupDtos = _mapper.Map<IEnumerable<ProductGroupDto>>(productGroups);
 
@@ -39,12 +39,12 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<ProductGroup>> GetProductGroupByIdAsync(int id)
+        public async Task<ServiceResponse<ProductGroup>> GetProductGroupByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<ProductGroup>();
             try
             {
-                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(id);
+                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(SystemLocationId, id);
                 if (productGroup == null)
                 {
                     response.Success = false;
@@ -65,12 +65,12 @@ namespace HefestusApi.Services.Materiais
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductGroupByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductGroupByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var productGroups = await _productGroupRepository.SearchProductGroupByNameAsync(searchTerm.ToLower());
+                var productGroups = await _productGroupRepository.SearchProductGroupByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -101,7 +101,7 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<ProductGroup>> CreateProductGroupAsync(ProductGroupRequestDataDto request)
+        public async Task<ServiceResponse<ProductGroup>> CreateProductGroupAsync(ProductGroupRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<ProductGroup>();
             try
@@ -109,6 +109,7 @@ namespace HefestusApi.Services.Materiais
                 var productGroup = new ProductGroup
                 {
                     Name = request.Name,
+                    SystemLocationId = SystemLocationId
                 };
 
                 await _productGroupRepository.AddProductGroupAsync(productGroup);
@@ -126,12 +127,12 @@ namespace HefestusApi.Services.Materiais
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdateProductGroupAsync(int id, ProductGroupRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateProductGroupAsync( int id, ProductGroupRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(id);
+                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(SystemLocationId, id);
                 if (productGroup == null)
                 {
                     response.Success = false;
@@ -159,12 +160,12 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteProductGroupAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteProductGroupAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(id);
+                var productGroup = await _productGroupRepository.GetProductGroupByIdAsync(SystemLocationId, id);
 
                 if (productGroup == null)
                 {

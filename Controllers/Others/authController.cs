@@ -1,7 +1,10 @@
 ﻿using HefestusApi.Models.Data;
 using HefestusApi.Models.Pessoal;
+using HefestusApi.Utilities.functions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HefestusApi.Controllers.Others
 {
@@ -12,7 +15,7 @@ namespace HefestusApi.Controllers.Others
         private readonly DataContext _context;
         private readonly TokenService _tokenGenerator;
 
-        public class RequiredCampsForAuthentication
+        public class RequiredCampsForAuthenticationUser
         {
             public string Username { get; set; }
             public string Password { get; set; }
@@ -24,12 +27,16 @@ namespace HefestusApi.Controllers.Others
             _tokenGenerator = tokenGenerator;
         }
 
+
+        [Authorize(Policy = "Policy3")]
         [HttpPost]
-        public async Task<ActionResult> SignIn(RequiredCampsForAuthentication userCredentials)
+        public async Task<ActionResult> SignIn(RequiredCampsForAuthenticationUser userCredentials)
         {
+            var systemLocationIdFromToken = User.GetSystemLocationId();
+
             var user = await _context.Users
                 .Include(x => x.Person)
-                .FirstOrDefaultAsync(u => u.Name == userCredentials.Username);
+                .FirstOrDefaultAsync(u => u.Name == userCredentials.Username && u.SystemLocationId == systemLocationIdFromToken);
 
             if (user == null)
                 return BadRequest("Usuário não encontrado");
@@ -38,9 +45,18 @@ namespace HefestusApi.Controllers.Others
             if (!validPassword)
                 return BadRequest("Senha incorreta");
 
-            var token = _tokenGenerator.GenerateToken(user);
+            // Obter systemLocationId do token
 
-            return Ok(new {token = token});
+            if (systemLocationIdFromToken == null)
+                return Unauthorized("Token inválido ou expirado");
+
+            // Comparar systemLocationId do token com o do usuário
+            if (user.SystemLocationId.ToString() != systemLocationIdFromToken)
+                return Unauthorized("systemLocationId não compatível");
+
+            var token = _tokenGenerator.GenerateTokenUser(user);
+
+            return Ok(new { token = token });
         }
 
         [HttpGet("{token}")]
@@ -48,7 +64,7 @@ namespace HefestusApi.Controllers.Others
         {
             if (string.IsNullOrEmpty(token)) return Unauthorized("Token invalido");
 
-            var userName = _tokenGenerator.ValidateToken(token);
+            var userName = _tokenGenerator.ValidateTokenUser(token);
 
             if (userName == null) return Unauthorized("Token invalido");
 

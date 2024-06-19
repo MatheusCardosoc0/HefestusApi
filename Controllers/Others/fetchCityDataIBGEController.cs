@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace HefestusApi.Controllers.Others
 {
-    [Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class fetchCityDataIBGEController : ControllerBase

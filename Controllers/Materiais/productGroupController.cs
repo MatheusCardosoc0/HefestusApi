@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HefestusApi.Controllers.Produtos
 {
-    [Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class productGroupController : ControllerBase
@@ -20,10 +20,10 @@ namespace HefestusApi.Controllers.Produtos
             _productGroupService = productGroupService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllProductGroups()
+        [HttpGet("{SystemLocationId}")]
+        public async Task<IActionResult> GetAllProductGroups(string SystemLocationId)
         {
-            var serviceResponse = await _productGroupService.GetAllProductGroupsAsync();
+            var serviceResponse = await _productGroupService.GetAllProductGroupsAsync(SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -31,10 +31,10 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{locationId}/{id}")]
-        public async Task<IActionResult> GetProductGroupById(int id, int locationId, string detailLevel )
+        [HttpGet("{SystemLocationId}/{detailLevel}/{id}")]
+        public async Task<IActionResult> GetProductGroupById(string SystemLocationId, int id, string detailLevel )
         {
-            var serviceResponse = await _productGroupService.GetProductGroupByIdAsync(id);
+            var serviceResponse = await _productGroupService.GetProductGroupByIdAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -42,33 +42,22 @@ namespace HefestusApi.Controllers.Produtos
             return Ok(serviceResponse.Data);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProductGroup([FromBody] ProductGroupRequestDataDto request)
+        [HttpPost("{SystemLocationId}")]
+        public async Task<IActionResult> CreateProductGroup([FromBody] ProductGroupRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _productGroupService.CreateProductGroupAsync(request);
+            var serviceResponse = await _productGroupService.CreateProductGroupAsync(request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
             }
 
-            return CreatedAtAction(nameof(GetProductGroupById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+            return Ok(serviceResponse.Data);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProductGroup(int id, [FromBody] ProductGroupRequestDataDto request)
+        [HttpPut("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> UpdateProductGroup(int id, [FromBody] ProductGroupRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _productGroupService.UpdateProductGroupAsync(id, request);
-            if (!serviceResponse.Success)
-            {
-                return BadRequest(serviceResponse.Message);
-            }
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProductGroup(int id)
-        {
-            var serviceResponse = await _productGroupService.DeleteProductGroupAsync(id);
+            var serviceResponse = await _productGroupService.UpdateProductGroupAsync(id, request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -76,10 +65,21 @@ namespace HefestusApi.Controllers.Produtos
             return NoContent();
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<IActionResult> SearchProductGroupByName(string searchTerm, string detailLevel)
+        [HttpDelete("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> DeleteProductGroup(string SystemLocationId, int id)
         {
-            var serviceResponse = await _productGroupService.SearchProductGroupByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _productGroupService.DeleteProductGroupAsync(SystemLocationId, id);
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return NoContent();
+        }
+
+        [HttpGet("search/{SystemLocationId}/{detailLevel}/{searchTerm}")]
+        public async Task<IActionResult> SearchProductGroupByName(string searchTerm, string detailLevel, string SystemLocationId)
+        {
+            var serviceResponse = await _productGroupService.SearchProductGroupByNameAsync(searchTerm, detailLevel,SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

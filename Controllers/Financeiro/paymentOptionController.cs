@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HefestusApi.Controllers.Financeiro
 {
-    [Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class paymentOptionController : ControllerBase
@@ -17,10 +17,10 @@ namespace HefestusApi.Controllers.Financeiro
             _paymentOptionsService = paymentOptionsService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllPaymentOptions()
+        [HttpGet("{SystemLocationId}")]
+        public async Task<IActionResult> GetAllPaymentOptions(string SystemLocationId)
         {
-            var serviceResponse = await _paymentOptionsService.GetAllPaymentOptionsAsync();
+            var serviceResponse = await _paymentOptionsService.GetAllPaymentOptionsAsync(SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -28,10 +28,10 @@ namespace HefestusApi.Controllers.Financeiro
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{locationId}/{id}")]
-        public async Task<IActionResult> GetPaymentOptionById(int id)
+        [HttpGet("{SystemLocationId}/{detailLevel}/{id}")]
+        public async Task<IActionResult> GetPaymentOptionById(string SystemLocationId, int id)
         {
-            var serviceResponse = await _paymentOptionsService.GetPaymentOptionByIdAsync(id);
+            var serviceResponse = await _paymentOptionsService.GetPaymentOptionByIdAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -39,33 +39,22 @@ namespace HefestusApi.Controllers.Financeiro
             return Ok(serviceResponse.Data);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreatePaymentOption([FromBody] PaymentOptionRequestDataDto request)
+        [HttpPost("{SystemLocationId}")]
+        public async Task<IActionResult> CreatePaymentOption([FromBody] PaymentOptionRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _paymentOptionsService.CreatePaymentOptionAsync(request);
+            var serviceResponse = await _paymentOptionsService.CreatePaymentOptionAsync(request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
             }
 
-            return CreatedAtAction(nameof(GetPaymentOptionById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+            return Ok(serviceResponse.Data);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePaymentOption(int id, [FromBody] PaymentOptionRequestDataDto request)
+        [HttpPut("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> UpdatePaymentOption(int id, [FromBody] PaymentOptionRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _paymentOptionsService.UpdatePaymentOptionAsync(id, request);
-            if (!serviceResponse.Success)
-            {
-                return BadRequest(serviceResponse.Message);
-            }
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePaymentOption(int id)
-        {
-            var serviceResponse = await _paymentOptionsService.DeletePaymentOptionAsync(id);
+            var serviceResponse = await _paymentOptionsService.UpdatePaymentOptionAsync(id, request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -73,10 +62,21 @@ namespace HefestusApi.Controllers.Financeiro
             return NoContent();
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<IActionResult> SearchPaymentOptionByName(string searchTerm, string detailLevel)
+        [HttpDelete("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> DeletePaymentOption(string SystemLocationId, int id)
         {
-            var serviceResponse = await _paymentOptionsService.SearchPaymentOptionByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _paymentOptionsService.DeletePaymentOptionAsync(SystemLocationId, id);
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse.Message);
+            }
+            return NoContent();
+        }
+
+        [HttpGet("search/{SystemLocationId}/{detailLevel}/{searchTerm}")]
+        public async Task<IActionResult> SearchPaymentOptionByName(string searchTerm, string detailLevel, string SystemLocationId)
+        {
+            var serviceResponse = await _paymentOptionsService.SearchPaymentOptionByNameAsync(searchTerm, detailLevel,SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

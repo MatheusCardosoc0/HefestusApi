@@ -32,27 +32,31 @@ namespace HefestusApi.Models.Data
 
         public DbSet<SystemLocation> SystemLocation { get; set; }
 
+        public DbSet<SubLocation> SubLocation { get; set; }
+
+        public DbSet<UserAdmin> UserAdmin { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SystemLocation>()
+            modelBuilder.Entity<SubLocation>()
+                .HasOne(sb => sb.SystemLocation)
+                .WithMany(sb => sb.SubLocation)
+                .HasForeignKey(sb => sb.SystemLocationId);
+
+            modelBuilder.Entity<SubLocation>()
                 .HasOne(s => s.Person)
-                .WithOne(p => p.SystemLocation)
-                .HasForeignKey<SystemLocation>(s => s.PersonId);
+                .WithOne(p => p.SubLocation)
+                .HasForeignKey<SubLocation>(s => s.PersonId);
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Person)
                 .WithOne(p => p.User)
                 .HasForeignKey<User>(u => u.PersonId);
 
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Name)
-                .IsUnique();
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.DefaultLocation)
-                .WithMany(s => s.Users)
-                .HasForeignKey(s => s.SystemLocationId);
+            //modelBuilder.Entity<User>()
+            //    .HasIndex(u => u.Name)
+            //    .IsUnique(false);
 
             modelBuilder.Entity<Stock>()
                 .HasOne(s => s.Product)
@@ -60,19 +64,24 @@ namespace HefestusApi.Models.Data
                 .HasForeignKey(s => s.ProductId);
 
             modelBuilder.Entity<Stock>()
-                .HasOne(s => s.SystemLocation)
+                .HasOne(s => s.SubLocation)
                 .WithMany(p => p.Stocks)
-                .HasForeignKey(s => s.SystemLocationId);
+                .HasForeignKey(s => s.SubLocationId);
 
             modelBuilder.Entity<Person>()
                 .HasOne(p => p.City)
                 .WithMany(c => c.Persons)
                 .HasForeignKey(p => p.CityId);
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.SystemLocation)
+                .WithMany(u => u.Users)
+                .HasForeignKey(u => u.SystemLocationId);
+
             modelBuilder.Entity<Person>()
-                .HasOne(p => p.SystemLocation)
+                .HasOne(p => p.SubLocation)
                 .WithOne(p => p.Person)
-                .HasForeignKey<Person>(p => p.SystemLocationId);
+                .HasForeignKey<Person>(p => p.SubLocationId);
 
             modelBuilder.Entity<Person>()
                .HasOne(p => p.User)

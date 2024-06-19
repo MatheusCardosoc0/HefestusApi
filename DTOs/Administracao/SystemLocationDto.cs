@@ -4,21 +4,19 @@ namespace HefestusApi.DTOs.Administracao
 {
     public record struct SystemLocationDto
     (
-        int Id,
+        string Id,
         string Description,
-        int PersonId,
-        string LocationName,
-        PersonDto Person 
+        string Name
     );
 
     public record struct SystemLocationSimpleSearchDataDto(
-        int Id,
-        string LocationName
+        string Id,
+        string Name
     );
 
     public record struct SystemLocationRequestDataDto(
-        string PersonName,
-        string Description,
-        int PersonId
+        string Name,
+        string? Description,
+        string? Password
     );
 }

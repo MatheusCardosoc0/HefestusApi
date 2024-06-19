@@ -5,9 +5,9 @@ namespace HefestusApi.Repositories.Financeiro.Interfaces
 {
     public interface IPaymentConditionRepository
     {
-        Task<IEnumerable<PaymentCondition>> GetAllPaymentConditionsAsync();
-        Task<PaymentCondition?> GetPaymentConditionByIdAsync(int id);
-        Task<IEnumerable<PaymentCondition>> SearchPaymentConditionByNameAsync(string searchTerm);
+        Task<IEnumerable<PaymentCondition>> GetAllPaymentConditionsAsync(string SystemLocationId);
+        Task<PaymentCondition?> GetPaymentConditionByIdAsync(string SystemLocationId, int id);
+        Task<IEnumerable<PaymentCondition>> SearchPaymentConditionByNameAsync(string searchTerm, string SystemLocationId);
         Task<bool> AddPaymentConditionAsync(PaymentCondition paymentCondition);
         Task<bool> UpdatePaymentConditionAsync(PaymentCondition paymentCondition);
         Task<bool> DeletePaymentConditionAsync(PaymentCondition paymentCondition);

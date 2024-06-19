@@ -29,7 +29,7 @@ namespace HefestusApi.Repositories.Vendas
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync(string SystemLocationId)
         {
             return await _context.Order
                 .Include(o => o.Client)
@@ -39,10 +39,10 @@ namespace HefestusApi.Repositories.Vendas
                 .Include(o => o.PaymentOption)
                 .Include(o => o.PaymentCondition)
                 .Include(o => o.OrderInstallments)
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<Order?> GetOrderByIdAsync(int id)
+        public async Task<Order?> GetOrderByIdAsync(string SystemLocationId, int id)
         {
             return await _context.Order
                 .Include(o => o.Client)
@@ -55,11 +55,11 @@ namespace HefestusApi.Repositories.Vendas
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<IEnumerable<Order>> SearchOrderByNameAsync(string searchTerm)
+        public async Task<IEnumerable<Order>> SearchOrderByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.Order
                 .Where(p => EF.Functions.Like(p.Client.Name.ToLower(), $"%{searchTerm}%") )
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> UpdateOrderAsync(Order order)

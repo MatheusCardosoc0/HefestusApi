@@ -15,32 +15,32 @@ namespace HefestusApi.Repositories.Administracao
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<User>> GetAllUsersAsync(string SystemLocationId)
         {
             return await _context.Users
                 .Include(x => x.Person)
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(string SystemLocationId, string id)
         {
             return await _context.Users
                 .Include(c => c.Person)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id && c.SystemLocationId == SystemLocationId);
         }
 
-        public async Task<User?> GetUserByNameAsync(string name)
+        public async Task<User?> GetUserByNameAsync(string name, string systemLocationId)
         {
             return await _context.Users
                 .Include(c => c.Person)
                 .FirstOrDefaultAsync(c => c.Name == name);
         }
 
-        public async Task<IEnumerable<User>> SearchUserByNameAsync(string searchTerm)
+        public async Task<IEnumerable<User>> SearchUserByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.Users
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
-                .ToListAsync();
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> AddUserAsync(User user)
@@ -61,7 +61,7 @@ namespace HefestusApi.Repositories.Administracao
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<Person?> GetPersonAsync(int id)
+        public async Task<Person?> GetPersonAsync(string SystemLocationId, int id)
         {
             return await _context.Person.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
         }

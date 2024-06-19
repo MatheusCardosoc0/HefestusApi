@@ -14,23 +14,23 @@ namespace HefestusApi.Repositories
             _context = context;
         }
 
-        public async Task<List<PersonGroup>> GetAllPersonGroupsAsync()
+        public async Task<List<PersonGroup>> GetAllPersonGroupsAsync(string SystemLocationId)
         {
-            return await _context.PersonGroup.ToListAsync();
+            return await _context.PersonGroup.Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<PersonGroup?> GetPersonGroupByIdAsync(int id)
+        public async Task<PersonGroup?> GetPersonGroupByIdAsync(string SystemLocationId, int id)
         {
             return await _context.PersonGroup
                 .Include(pg => pg.Persons)
                 .FirstOrDefaultAsync(pg => pg.Id == id);
         }
 
-        public async Task<List<PersonGroup>> SearchPersonGroupByNameAsync(string searchTerm)
+        public async Task<List<PersonGroup>> SearchPersonGroupByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.PersonGroup
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
-                .ToListAsync();
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task AddPersonGroupAsync(PersonGroup personGroup)

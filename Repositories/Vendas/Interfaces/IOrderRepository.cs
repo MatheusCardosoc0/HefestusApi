@@ -5,9 +5,9 @@ namespace HefestusApi.Repositories.Vendas.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task<Order?> GetOrderByIdAsync(int id);
-        Task<IEnumerable<Order>> SearchOrderByNameAsync(string searchTerm);
+        Task<IEnumerable<Order>> GetAllOrdersAsync(string SystemLocationId);
+        Task<Order?> GetOrderByIdAsync(string SystemLocationId, int id);
+        Task<IEnumerable<Order>> SearchOrderByNameAsync(string searchTerm, string SystemLocationId);
         Task<bool> AddOrderAsync(Order order);
         Task<bool> UpdateOrderAsync(Order order);
         Task<bool> DeleteOrderAsync(Order order);

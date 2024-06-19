@@ -16,12 +16,12 @@ namespace HefestusApi.Services
             _cityRepository = cityRepository;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CityDto>>> GetAllCitiesAsync()
+        public async Task<ServiceResponse<IEnumerable<CityDto>>> GetAllCitiesAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<CityDto>>();
             try
             {
-                var cities = await _cityRepository.GetAllCitiesAsync();
+                var cities = await _cityRepository.GetAllCitiesAsync(SystemLocationId);
                 var cityDtos = cities.Select(c => new CityDto { Id = c.Id, Name = c.Name, IBGENumber = c.IBGENumber, State = c.State });
 
                 response.Data = cityDtos;
@@ -36,12 +36,12 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<City>> GetCityByIdAsync(int id)
+        public async Task<ServiceResponse<City>> GetCityByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<City>();
             try
             {
-                var city = await _cityRepository.GetCityByIdAsync(id);
+                var city = await _cityRepository.GetCityByIdAsync(SystemLocationId, id);
                 if (city == null)
                 {
                     response.Success = false;
@@ -62,12 +62,12 @@ namespace HefestusApi.Services
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchCityByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchCityByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var cities = await _cityRepository.SearchCityByNameAsync(searchTerm.ToLower());
+                var cities = await _cityRepository.SearchCityByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -98,7 +98,7 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<City>> CreateCityAsync(CityRequestDataDto request)
+        public async Task<ServiceResponse<City>> CreateCityAsync(CityRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<City>();
             try
@@ -125,12 +125,12 @@ namespace HefestusApi.Services
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdateCityAsync(int id, CityRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateCityAsync(int id, CityRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var city = await _cityRepository.GetCityByIdAsync(id);
+                var city = await _cityRepository.GetCityByIdAsync(SystemLocationId, id);
                 if (city == null)
                 {
                     response.Success = false;
@@ -160,12 +160,12 @@ namespace HefestusApi.Services
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteCityAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteCityAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var city = await _cityRepository.GetCityByIdAsync(id);
+                var city = await _cityRepository.GetCityByIdAsync(SystemLocationId, id);
 
                 if (city == null)
                 {

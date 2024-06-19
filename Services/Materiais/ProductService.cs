@@ -18,12 +18,12 @@ namespace HefestusApi.Services.Materiais
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<ProductDto>>> GetAllProductsAsync()
+        public async Task<ServiceResponse<IEnumerable<ProductDto>>> GetAllProductsAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<ProductDto>>();
             try
             {
-                var products = await _productRepository.GetAllProductsAsync();
+                var products = await _productRepository.GetAllProductsAsync(SystemLocationId);
 
                 var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
 
@@ -39,12 +39,12 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<object>> GetProductByIdAsync(int id, string detailLevel, int locationId)
+        public async Task<ServiceResponse<object>> GetProductByIdAsync(string SystemLocationId, int id, string detailLevel, int SubLocationId)
         {
             var response = new ServiceResponse<object>();
             try
             {
-                var product = await _productRepository.GetProductByIdAsync(id);
+                var product = await _productRepository.GetProductByIdAsync(SystemLocationId, id);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -52,8 +52,8 @@ namespace HefestusApi.Services.Materiais
                     {
                         Id = product.Id,
                         Name = product.Name,
-                        PriceSale = product.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).PriceSale,
-                        WholesalePrice = product.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).WholesalePrice,
+                        PriceSale = product.Stocks.FirstOrDefault(s => s.SubLocationId == SubLocationId).PriceSale,
+                        WholesalePrice = product.Stocks.FirstOrDefault(s => s.SubLocationId == SubLocationId).WholesalePrice,
                     };
 
                     response.Data = simpleDtos;
@@ -78,12 +78,12 @@ namespace HefestusApi.Services.Materiais
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductByNameAsync(string searchTerm, string detailLevel, int locationId)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductByNameAsync(string searchTerm, string detailLevel, string SystemLocationId, int SubLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var products = await _productRepository.SearchProductByNameAsync(searchTerm.ToLower());
+                var products = await _productRepository.SearchProductByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -91,8 +91,8 @@ namespace HefestusApi.Services.Materiais
                     {
                         Id = c.Id,
                         Name = c.Name,
-                        PriceSale = c.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).PriceSale,
-                        WholesalePrice = c.Stocks.FirstOrDefault(s => s.SystemLocationId == locationId).WholesalePrice,
+                        PriceSale = c.Stocks.FirstOrDefault(s => s.SubLocationId == SubLocationId).PriceSale,
+                        WholesalePrice = c.Stocks.FirstOrDefault(s => s.SubLocationId == SubLocationId).WholesalePrice,
                     }).Cast<object>().ToList();
 
                     response.Data = simpleDtos;
@@ -116,7 +116,7 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<Stock>> CreateProductAsync(ProductRequestDataDto request)
+        public async Task<ServiceResponse<Stock>> CreateProductAsync(ProductRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<Stock>();
             try
@@ -135,6 +135,7 @@ namespace HefestusApi.Services.Materiais
                     GroupId = request.Group.Id,
                     FamilyId = request.Family.Id,
                     SubgroupId = request.SubGroup.Id,
+                    SystemLocationId = SystemLocationId
 
                 };
                 await _productRepository.AddProductAsync(product);
@@ -153,7 +154,7 @@ namespace HefestusApi.Services.Materiais
                     MinStock = request.MinStock,
                     MaxStock = request.MaxStock,
                     CurrentStock = request.CurrentStock,
-                    SystemLocationId = request.SystemLocationId,
+                    SubLocationId = request.SubLocationId,
                     LastStockUpdate = new DateTime(),
                     Location = request.Location
                 };
@@ -173,12 +174,12 @@ namespace HefestusApi.Services.Materiais
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdateProductAsync(int id, ProductRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateProductAsync(int id, ProductRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var product = await _productRepository.GetProductByIdAsync(id);
+                var product = await _productRepository.GetProductByIdAsync(SystemLocationId, id);
                 if (product == null)
                 {
                     response.Success = false;
@@ -198,11 +199,12 @@ namespace HefestusApi.Services.Materiais
                 product.GroupId = request.Group.Id;
                 product.FamilyId = request.Family.Id;
                 product.SubgroupId = request.SubGroup.Id;
+                product.SystemLocationId = SystemLocationId;
 
 
                 bool updateResultProduct = await _productRepository.UpdateProductAsync(product);
 
-                var stock = await _productRepository.GetSelectedStockAsync(request.SystemLocationId, id);
+                var stock = await _productRepository.GetSelectedStockAsync(request.SubLocationId, id, SystemLocationId);
                 if (stock == null)
                 {
                     response.Success = false;
@@ -244,12 +246,12 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteProductAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var product = await _productRepository.GetProductByIdAsync(id);
+                var product = await _productRepository.GetProductByIdAsync(SystemLocationId, id);
 
                 if (product == null)
                 {

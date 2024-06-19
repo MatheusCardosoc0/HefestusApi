@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace HefestusApi.Models.Pessoal
 {
-    public class Person : TimeTrail
+    public class Person 
     {
         public int Id { get; set; }
         [StringLength(50, ErrorMessage = "O nome não pode exceder 50 caracteres.")]
@@ -32,14 +32,20 @@ namespace HefestusApi.Models.Pessoal
         public int CityId { get; set; }
         public City City { get; set; }
         public List<PersonGroup> PersonGroup { get; set; }
-        public int? UserId { get; set; }
-        public int? SystemLocationId { get; set; }
+        public string SystemLocationId { get; set; }
+        public int? SubLocationId { get; set; }
+        public SubLocation? SubLocation { get; set; }
+        public string? UserId { get; set; }
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; private set; } = DateTime.UtcNow;
+
+        // Métodos para atualizar datas
+        public void UpdateLastModified() => LastModifiedAt = DateTime.UtcNow;
 
         [JsonIgnore]
         public User? User { get; set; }
         [JsonIgnore]
         public List<Order>? Orders { get; set; }
-        [JsonIgnore]
-        public SystemLocation? SystemLocation { get; set; }
     }
 }

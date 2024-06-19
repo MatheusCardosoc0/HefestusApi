@@ -14,23 +14,23 @@ namespace HefestusApi.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<City>> GetAllCitiesAsync()
+        public async Task<IEnumerable<City>> GetAllCitiesAsync(string SystemLocationId)
         {
-            return await _context.Cities.ToListAsync();
+            return await _context.Cities.Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<City?> GetCityByIdAsync(int id)
+        public async Task<City?> GetCityByIdAsync(string SystemLocationId, int id)
         {
             return await _context.Cities
                 .Include(c => c.Persons)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<IEnumerable<City>> SearchCityByNameAsync(string searchTerm)
+        public async Task<IEnumerable<City>> SearchCityByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.Cities
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
-                .ToListAsync();
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> AddCityAsync(City city)

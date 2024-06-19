@@ -22,12 +22,12 @@ namespace HefestusApi.Services.Vendas
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<OrderDto>>> GetAllOrdersAsync()
+        public async Task<ServiceResponse<IEnumerable<OrderDto>>> GetAllOrdersAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<OrderDto>>();
             try
             {
-                var order = await _orderRepository.GetAllOrdersAsync();
+                var order = await _orderRepository.GetAllOrdersAsync(SystemLocationId);
 
                 var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(order);
 
@@ -43,12 +43,12 @@ namespace HefestusApi.Services.Vendas
             return response;
         }
 
-        public async Task<ServiceResponse<OrderDto>> GetOrderByIdAsync(int id)
+        public async Task<ServiceResponse<OrderDto>> GetOrderByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<OrderDto>();
             try
             {
-                var order = await _orderRepository.GetOrderByIdAsync(id);
+                var order = await _orderRepository.GetOrderByIdAsync(SystemLocationId, id);
                 if (order == null)
                 {
                     response.Success = false;
@@ -71,12 +71,12 @@ namespace HefestusApi.Services.Vendas
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchOrderByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchOrderByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var order = await _orderRepository.SearchOrderByNameAsync(searchTerm.ToLower());
+                var order = await _orderRepository.SearchOrderByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -109,7 +109,7 @@ namespace HefestusApi.Services.Vendas
             return response;
         }
 
-        public async Task<ServiceResponse<Order>> CreateOrderAsync(OrderRequestDataDto request)
+        public async Task<ServiceResponse<Order>> CreateOrderAsync(OrderRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<Order>();
             try
@@ -129,7 +129,8 @@ namespace HefestusApi.Services.Vendas
                     CostOfFreight = request.CostOfFreight ?? 0,
                     TypeFreight = request.TypeFreight,
                     OrderProducts = new List<OrderProduct>(),
-                    OrderInstallments = new List<OrderInstallment>()
+                    OrderInstallments = new List<OrderInstallment>(),
+                    SystemLocationId = SystemLocationId
                 };
 
                 await _orderRepository.AddOrderAsync(order);
@@ -176,12 +177,12 @@ namespace HefestusApi.Services.Vendas
         }
 
 
-        public async Task<ServiceResponse<bool>> UpdateOrderAsync(int id, OrderRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateOrderAsync( int id, OrderRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var orderToUpdate = await _orderRepository.GetOrderByIdAsync(id);
+                var orderToUpdate = await _orderRepository.GetOrderByIdAsync(SystemLocationId, id);
 
                 if (orderToUpdate == null)
                 {
@@ -203,6 +204,7 @@ namespace HefestusApi.Services.Vendas
                 orderToUpdate.TypeOrder = request.TypeOrder;
                 orderToUpdate.CostOfFreight = request.CostOfFreight ?? 0;
                 orderToUpdate.TypeFreight = request.TypeFreight;
+                orderToUpdate.SystemLocationId = SystemLocationId;
 
 
                 await _orderRepository.RemoveOrderProductAsync(orderToUpdate.OrderProducts);
@@ -214,7 +216,7 @@ namespace HefestusApi.Services.Vendas
                         ProductId = op.ProductId,
                         Amount = op.Amount,
                         UnitPrice = op.UnitPrice,
-                        TotalPrice = op.TotalPrice
+                        TotalPrice = op.TotalPrice 
                     });
                 }
 
@@ -250,12 +252,12 @@ namespace HefestusApi.Services.Vendas
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteOrderAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteOrderAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var order = await _orderRepository.GetOrderByIdAsync(id);
+                var order = await _orderRepository.GetOrderByIdAsync(SystemLocationId, id);
 
                 if (order == null)
                 {

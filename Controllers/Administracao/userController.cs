@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HefestusApi.Controllers.Administracao
 {
-    //[Authorize]
+    [Authorize(Policy = "Policy1OrPolicy2")]
     [Route("api/[controller]")]
     [ApiController]
     public class userController : ControllerBase
@@ -17,10 +17,10 @@ namespace HefestusApi.Controllers.Administracao
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAllUsers()
+        [HttpGet("{SystemLocationId}")]
+        public async Task<ActionResult> GetAllUsers(string SystemLocationId)
         {
-            var serviceResponse = await _userService.GetAllUsersAsync();
+            var serviceResponse = await _userService.GetAllUsersAsync( SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return StatusCode(500, serviceResponse.Message);
@@ -29,10 +29,10 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{locationId}/{id}")]
-        public async Task<ActionResult> GetUserById(int id)
+        [HttpGet("{SystemLocationId}/{detailLevel}/{id}")]
+        public async Task<ActionResult> GetUserById(string SystemLocationId, string id)
         {
-            var serviceResponse = await _userService.GetUserByIdAsync(id);
+            var serviceResponse = await _userService.GetUserByIdAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -41,10 +41,10 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult> SearchUserByName(string searchTerm, string detailLevel)
+        [HttpGet("search/{SystemLocationId}/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult> SearchUserByName(string searchTerm, string detailLevel, string SystemLocationId)
         {
-            var serviceResponse = await _userService.SearchUserByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _userService.SearchUserByNameAsync(searchTerm, detailLevel,SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -53,24 +53,24 @@ namespace HefestusApi.Controllers.Administracao
             return Ok(serviceResponse.Data);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreateUser([FromBody] UserRequestDataDto request)
+        [HttpPost("{SystemLocationId}")]
+        public async Task<ActionResult> CreateUser([FromBody] UserRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _userService.CreateUserAsync(request);
+            var serviceResponse = await _userService.CreateUserAsync(request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
             }
 
             //return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id }, serviceResponse?.Data);
-            return CreatedAtAction(nameof(GetUserById), new { id = serviceResponse?.Data?.Id, detailLevel = "complete", locationId = (int?)null }, serviceResponse?.Data);
+            return Ok(serviceResponse.Data);
 
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateUser(int id, [FromBody] UserRequestDataDto request)
+        [HttpPut("{SystemLocationId}/{id}")]
+        public async Task<ActionResult> UpdateUser(string id, [FromBody] UserRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _userService.UpdateUserAsync(id, request);
+            var serviceResponse = await _userService.UpdateUserAsync(id, request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

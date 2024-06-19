@@ -6,11 +6,11 @@ namespace HefestusApi.Services.Administracao.Interfaces
 {
     public interface IUserService
     {
-        Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUsersAsync();
-        Task<ServiceResponse<UserDto>> GetUserByIdAsync(int id);
-        Task<ServiceResponse<IEnumerable<object>>> SearchUserByNameAsync(string searchTerm, string detailLevel);
-        Task<ServiceResponse<User>> CreateUserAsync(UserRequestDataDto request);
-        Task<ServiceResponse<bool>> UpdateUserAsync(int id, UserRequestDataDto request);
-        Task<ServiceResponse<bool>> DeleteUserAsync(int id);
+        Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUsersAsync(string SystemLocationId);
+        Task<ServiceResponse<UserDto>> GetUserByIdAsync(string SystemLocationId, string id);
+        Task<ServiceResponse<IEnumerable<object>>> SearchUserByNameAsync(string searchTerm, string detailLevel, string SystemLocationId);
+        Task<ServiceResponse<User>> CreateUserAsync(UserRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> UpdateUserAsync( string id, UserRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> DeleteUserAsync(string SystemLocationId, string id);
     }
 }

@@ -62,10 +62,7 @@ namespace HefestusApi.DTOs.Mapping
             CreateMap<PersonGroup, PersonGroupDto>();
             CreateMap<City, CityDto>();
 
-            CreateMap<SystemLocation, SystemLocationDto>()
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Person.Name));
-            CreateMap<SystemLocation, SystemLocationSimpleSearchDataDto>()
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Person.Name));
+            CreateMap<SystemLocation, SystemLocationDto>();
         }
     }
 }

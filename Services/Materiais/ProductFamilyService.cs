@@ -22,37 +22,35 @@ namespace HefestusApi.Services.Materiais
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<ProductFamilyDto>>> GetAllProductFamiliesAsync()
+        public async Task<ServiceResponse<IEnumerable<ProductFamilyDto>>> GetAllProductFamiliesAsync(string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<ProductFamilyDto>>();
             try
             {
-                var productFamilies = await _productFamilyRepository.GetAllProductFamiliesAsync();
-
+                var productFamilies = await _productFamilyRepository.GetAllProductFamiliesAsync(SystemLocationId);
                 var productFamilyDtos = _mapper.Map<IEnumerable<ProductFamilyDto>>(productFamilies);
-
                 response.Data = productFamilyDtos;
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = "Ocorreu um erro ao tentar obter todas as familia de produtos: " + ex.Message;
+                response.Message = "Ocorreu um erro ao tentar obter todas as famílias de produtos: " + ex.Message;
                 return response;
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<ProductFamily>> GetProductFamilyByIdAsync(int id)
+        public async Task<ServiceResponse<ProductFamily>> GetProductFamilyByIdAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<ProductFamily>();
             try
             {
-                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(id);
+                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(SystemLocationId, id);
                 if (productFamily == null)
                 {
                     response.Success = false;
-                    response.Message = "Familia de produtos não encontrada.";
+                    response.Message = "Família de produtos não encontrada.";
                     return response;
                 }
 
@@ -61,20 +59,19 @@ namespace HefestusApi.Services.Materiais
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = "Ocorreu um erro ao tentar obter a familia de produtos: " + ex.Message;
+                response.Message = "Ocorreu um erro ao tentar obter a família de produtos: " + ex.Message;
                 return response;
             }
 
             return response;
         }
 
-
-        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductFamilyByNameAsync(string searchTerm, string detailLevel)
+        public async Task<ServiceResponse<IEnumerable<object>>> SearchProductFamilyByNameAsync(string searchTerm, string detailLevel, string SystemLocationId)
         {
             var response = new ServiceResponse<IEnumerable<object>>();
             try
             {
-                var productFamilies = await _productFamilyRepository.SearchProductFamilyByNameAsync(searchTerm.ToLower());
+                var productFamilies = await _productFamilyRepository.SearchProductFamilyByNameAsync(searchTerm.ToLower(), SystemLocationId);
 
                 if (detailLevel.Equals("simple", StringComparison.OrdinalIgnoreCase))
                 {
@@ -105,7 +102,7 @@ namespace HefestusApi.Services.Materiais
             return response;
         }
 
-        public async Task<ServiceResponse<ProductFamily>> CreateProductFamilyAsync(ProductFamilyRequestDataDto request)
+        public async Task<ServiceResponse<ProductFamily>> CreateProductFamilyAsync(ProductFamilyRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<ProductFamily>();
             try
@@ -113,42 +110,42 @@ namespace HefestusApi.Services.Materiais
                 var productFamily = new ProductFamily
                 {
                     Name = request.Name,
+                    SystemLocationId = SystemLocationId
                 };
 
                 await _productFamilyRepository.AddProductFamilyAsync(productFamily);
-
                 response.Data = productFamily;
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Erro ao criar a familia de produtos: {ex.Message}";
+                response.Message = $"Erro ao criar a família de produtos: {ex.Message}";
                 return response;
             }
 
             return response;
         }
 
-
-        public async Task<ServiceResponse<bool>> UpdateProductFamilyAsync(int id, ProductFamilyRequestDataDto request)
+        public async Task<ServiceResponse<bool>> UpdateProductFamilyAsync(int id, ProductFamilyRequestDataDto request, string SystemLocationId)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(id);
+                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(SystemLocationId, id);
                 if (productFamily == null)
                 {
                     response.Success = false;
-                    response.Message = $"Familia de produtos com o ID {id} não foi encontrada.";
+                    response.Message = $"Família de produtos com o ID {id} não foi encontrada.";
                     return response;
                 }
 
                 productFamily.Name = request.Name;
+                productFamily.SystemLocationId = SystemLocationId;
 
                 bool updateResult = await _productFamilyRepository.UpdateProductFamilyAsync(productFamily);
                 if (!updateResult)
                 {
-                    throw new Exception("A atualização da familia de produtos falhou por uma razão desconhecida.");
+                    throw new Exception("A atualização da família de produtos falhou por uma razão desconhecida.");
                 }
 
                 response.Data = true;
@@ -156,31 +153,31 @@ namespace HefestusApi.Services.Materiais
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Erro ao atualizar a familia de produtos: {ex.Message}";
+                response.Message = $"Erro ao atualizar a família de produtos: {ex.Message}";
                 return response;
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteProductFamilyAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteProductFamilyAsync(string SystemLocationId, int id)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(id);
+                var productFamily = await _productFamilyRepository.GetProductFamilyByIdAsync(SystemLocationId, id);
 
                 if (productFamily == null)
                 {
                     response.Success = false;
-                    response.Message = $"Familia de produtos com o ID {id} não existe.";
+                    response.Message = $"Família de produtos com o ID {id} não existe.";
                     return response;
                 }
 
                 if (productFamily.Products.Any())
                 {
                     response.Success = false;
-                    response.Message = $"Familia de produtos não pode ser excluida, pois está relacionado a produtos.";
+                    response.Message = $"Família de produtos não pode ser excluída, pois está relacionada a produtos.";
                     return response;
                 }
 
@@ -188,7 +185,7 @@ namespace HefestusApi.Services.Materiais
                 if (!deleted)
                 {
                     response.Success = false;
-                    response.Message = "Não foi possível deletar a familia de produtos devido a restrições de integridade.";
+                    response.Message = "Não foi possível deletar a família de produtos devido a restrições de integridade.";
                     return response;
                 }
 
@@ -197,7 +194,7 @@ namespace HefestusApi.Services.Materiais
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = "Ocorreu um erro ao deletar a familia de produtos: " + ex.Message;
+                response.Message = "Ocorreu um erro ao deletar a família de produtos: " + ex.Message;
                 return response;
             }
 

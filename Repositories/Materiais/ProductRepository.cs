@@ -14,17 +14,17 @@ namespace HefestusApi.Repositories.Materiais
             _context = context;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(string SystemLocationId)
         {
             return await _context.Product
                 .Include(p => p.Subgroup)
                 .Include(p => p.Group)
                 .Include(p => p.Family)
                 .Include(p => p.Stocks)
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<Product?> GetProductByIdAsync(int id)
+        public async Task<Product?> GetProductByIdAsync(string SystemLocationId, int id)
         {
             return await _context.Product
                 .Include(p => p.Subgroup)
@@ -34,15 +34,15 @@ namespace HefestusApi.Repositories.Materiais
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Product>> SearchProductByNameAsync(string searchTerm)
+        public async Task<IEnumerable<Product>> SearchProductByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.Product
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
                 .Include(p => p.Subgroup)
                 .Include(p => p.Group)
                 .Include(p => p.Family)
                 .Include(p => p.Stocks)
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> AddProductAsync(Product product)
@@ -74,9 +74,9 @@ namespace HefestusApi.Repositories.Materiais
             await _context.Stock.AddAsync(stock);
         }
 
-        public async Task<Stock> GetSelectedStockAsync(int SystemLocationId,  int ProductId)
+        public async Task<Stock> GetSelectedStockAsync(int SubLocationId,  int ProductId, string SystemLocationId)
         {
-            return await _context.Stock.FirstOrDefaultAsync(s => s.ProductId == ProductId && s.SystemLocationId == SystemLocationId);
+            return await _context.Stock.FirstOrDefaultAsync(s => s.ProductId == ProductId && s.SubLocationId == SubLocationId && s.Product.SystemLocationId == SystemLocationId);
         }
         
         public async Task<bool> SaveChangesAsync()

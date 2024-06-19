@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     /// <inheritdoc />
-    public partial class stock : Migration
+    public partial class firstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,8 +21,9 @@ namespace HefestusApi.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     IBGENumber = table.Column<int>(type: "integer", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: false),
-                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -37,7 +38,10 @@ namespace HefestusApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Installments = table.Column<int>(type: "integer", nullable: false),
-                    Interval = table.Column<int>(type: "integer", nullable: false)
+                    Interval = table.Column<int>(type: "integer", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,7 +55,10 @@ namespace HefestusApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    isUseCreditLimit = table.Column<bool>(type: "boolean", nullable: false)
+                    isUseCreditLimit = table.Column<bool>(type: "boolean", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,8 +72,9 @@ namespace HefestusApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: false),
-                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,7 +87,10 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,7 +103,10 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,7 +119,10 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,10 +133,12 @@ namespace HefestusApi.Migrations
                 name: "SystemLocation",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    PersonId = table.Column<int>(type: "integer", nullable: false)
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,6 +163,9 @@ namespace HefestusApi.Migrations
                     Reference = table.Column<string>(type: "text", nullable: true),
                     Batch = table.Column<string>(type: "text", nullable: true),
                     UnitOfMensuration = table.Column<string>(type: "text", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ProductFamilyId = table.Column<int>(type: "integer", nullable: true),
                     ProductGroupId = table.Column<int>(type: "integer", nullable: true),
                     ProductSubGroupId = table.Column<int>(type: "integer", nullable: true)
@@ -187,15 +209,38 @@ namespace HefestusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "SubLocation",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PersonId = table.Column<int>(type: "integer", nullable: false),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubLocation", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubLocation_SystemLocation_SystemLocationId",
+                        column: x => x.SystemLocationId,
+                        principalTable: "SystemLocation",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
                     PersonId = table.Column<int>(type: "integer", nullable: true),
-                    SystemLocationId = table.Column<int>(type: "integer", nullable: true)
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -204,7 +249,8 @@ namespace HefestusApi.Migrations
                         name: "FK_Users_SystemLocation_SystemLocationId",
                         column: x => x.SystemLocationId,
                         principalTable: "SystemLocation",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -226,9 +272,11 @@ namespace HefestusApi.Migrations
                     WholesalePrice = table.Column<decimal>(type: "numeric", nullable: false),
                     MinPriceSale = table.Column<decimal>(type: "numeric", nullable: false),
                     MinWholesalePrice = table.Column<decimal>(type: "numeric", nullable: false),
-                    SystemLocationId = table.Column<int>(type: "integer", nullable: false),
-                    Location = table.Column<string>(type: "text", nullable: true),
-                    LastStockUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    SubLocationId = table.Column<int>(type: "integer", nullable: false),
+                    Location = table.Column<string>(type: "text", nullable: false),
+                    LastStockUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -240,9 +288,9 @@ namespace HefestusApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Stock_SystemLocation_SystemLocationId",
-                        column: x => x.SystemLocationId,
-                        principalTable: "SystemLocation",
+                        name: "FK_Stock_SubLocation_SubLocationId",
+                        column: x => x.SubLocationId,
+                        principalTable: "SubLocation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -273,10 +321,12 @@ namespace HefestusApi.Migrations
                     ICMSContributor = table.Column<bool>(type: "boolean", nullable: true),
                     PersonType = table.Column<string>(type: "text", nullable: false),
                     CityId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
-                    SystemLocationId = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: false),
-                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
+                    SubLocationId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
+                    LinkedSystemLocationId = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -288,8 +338,14 @@ namespace HefestusApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Person_SystemLocation_SystemLocationId",
-                        column: x => x.SystemLocationId,
+                        name: "FK_Person_SubLocation_SubLocationId",
+                        column: x => x.SubLocationId,
+                        principalTable: "SubLocation",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Person_SystemLocation_LinkedSystemLocationId",
+                        column: x => x.LinkedSystemLocationId,
                         principalTable: "SystemLocation",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -305,6 +361,7 @@ namespace HefestusApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SystemLocationId = table.Column<string>(type: "text", nullable: false),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
                     ResponsibleId = table.Column<int>(type: "integer", nullable: false),
                     PaymentConditionId = table.Column<int>(type: "integer", nullable: false),
@@ -318,8 +375,8 @@ namespace HefestusApi.Migrations
                     TypeOrder = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CostOfFreight = table.Column<float>(type: "real", nullable: false),
                     TypeFreight = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: false),
-                    LastModifiedAt = table.Column<string>(type: "text", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -486,9 +543,14 @@ namespace HefestusApi.Migrations
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Person_SystemLocationId",
+                name: "IX_Person_LinkedSystemLocationId",
                 table: "Person",
-                column: "SystemLocationId",
+                column: "LinkedSystemLocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Person_SubLocationId",
+                table: "Person",
+                column: "SubLocationId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -568,8 +630,13 @@ namespace HefestusApi.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Stock_SystemLocationId",
+                name: "IX_Stock_SubLocationId",
                 table: "Stock",
+                column: "SubLocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubLocation_SystemLocationId",
+                table: "SubLocation",
                 column: "SystemLocationId");
 
             migrationBuilder.CreateIndex(
@@ -628,6 +695,9 @@ namespace HefestusApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "SubLocation");
 
             migrationBuilder.DropTable(
                 name: "Users");

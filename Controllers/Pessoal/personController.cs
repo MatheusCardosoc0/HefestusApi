@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HefestusApi.Controllers.PESSOAL
 
 {
-    //[Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class personController : ControllerBase
@@ -19,10 +19,10 @@ namespace HefestusApi.Controllers.PESSOAL
             _personService = personService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllPersons()
+        [HttpGet("{SystemLocationId}")]
+        public async Task<IActionResult> GetAllPersons(string SystemLocationId)
         {
-            var serviceResponse = await _personService.GetAllPersonsAsync();
+            var serviceResponse = await _personService.GetAllPersonsAsync( SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -30,10 +30,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{locationId}/{id}")]
-        public async Task<IActionResult> GetPersonById(int id)
+        [HttpGet("{SystemLocationId}/{detailLevel}/{id}")]
+        public async Task<IActionResult> GetPersonById(string SystemLocationId, int id)
         {
-            var serviceResponse = await _personService.GetPersonByIdAsync(id);
+            var serviceResponse = await _personService.GetPersonByIdAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -41,22 +41,22 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreatePerson([FromBody] PersonRequestDataDto request)
+        [HttpPost("{SystemLocationId}")]
+        public async Task<IActionResult> CreatePerson([FromBody] PersonRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _personService.CreatePersonAsync(request);
+            var serviceResponse = await _personService.CreatePersonAsync(request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
             }
             // Assumindo que a resposta inclui a entidade criada ou seu DTO
-            return CreatedAtAction(nameof(GetPersonById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+            return Ok(serviceResponse.Data);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePerson(int id, [FromBody] PersonRequestDataDto request)
+        [HttpPut("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> UpdatePerson(int id, [FromBody] PersonRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _personService.UpdatePersonAsync(id, request);
+            var serviceResponse = await _personService.UpdatePersonAsync(SystemLocationId, id, request);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -64,10 +64,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePerson(int id)
+        [HttpDelete("{SystemLocationId}/{id}")]
+        public async Task<IActionResult> DeletePerson(string SystemLocationId, int id)
         {
-            var serviceResponse = await _personService.DeletePersonAsync(id);
+            var serviceResponse = await _personService.DeletePersonAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -75,10 +75,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return NoContent();
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<IActionResult> SearchPersonByName(string searchTerm, string detailLevel)
+        [HttpGet("search/{SystemLocationId}/{detailLevel}/{searchTerm}")]
+        public async Task<IActionResult> SearchPersonByName(string searchTerm, string detailLevel, string SystemLocationId)
         {
-            var serviceResponse = await _personService.SearchPersonByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _personService.SearchPersonByNameAsync(searchTerm, detailLevel,SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

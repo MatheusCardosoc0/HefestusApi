@@ -8,11 +8,11 @@ namespace HefestusApi.Services.Vendas.Interfaces
 {
     public interface IOrderService
     {
-        Task<ServiceResponse<IEnumerable<OrderDto>>> GetAllOrdersAsync();
-        Task<ServiceResponse<OrderDto>> GetOrderByIdAsync(int id);
-        Task<ServiceResponse<IEnumerable<object>>> SearchOrderByNameAsync(string searchTerm, string detailLevel);
-        Task<ServiceResponse<Order>> CreateOrderAsync(OrderRequestDataDto request);
-        Task<ServiceResponse<bool>> UpdateOrderAsync(int id, OrderRequestDataDto request);
-        Task<ServiceResponse<bool>> DeleteOrderAsync(int id);
+        Task<ServiceResponse<IEnumerable<OrderDto>>> GetAllOrdersAsync(string SystemLocationId);
+        Task<ServiceResponse<OrderDto>> GetOrderByIdAsync(string SystemLocationId, int id);
+        Task<ServiceResponse<IEnumerable<object>>> SearchOrderByNameAsync(string searchTerm, string detailLevel, string SystemLocationId);
+        Task<ServiceResponse<Order>> CreateOrderAsync(OrderRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> UpdateOrderAsync(int id, OrderRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> DeleteOrderAsync(string SystemLocationId, int id);
     }
 }

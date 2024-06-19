@@ -42,7 +42,7 @@
         string? Reference,
         string? Batch,
         string UnitOfMensuration,
-        int SystemLocationId,
+        int SubLocationId,
         float MinStock,
         float MaxStock,
         float CurrentStock,

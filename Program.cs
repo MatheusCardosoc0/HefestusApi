@@ -39,27 +39,69 @@ namespace HefestusApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddAuthentication(auth =>
+            // Configurar esquema de autenticação padrão
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer("Jwt1", options =>
             {
-                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(token =>
-            {
-                token.TokenValidationParameters = new TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "https://localhost:7263/",
                     ValidAudience = "https://localhost:7263/",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:key"]!)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:Key1"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true
+                };
+            })
+            .AddJwtBearer("Jwt2", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "https://localhost:7263/",
+                    ValidAudience = "https://localhost:7263/",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:Key2"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true
+                };
+            })
+            .AddJwtBearer("Jwt3", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "https://localhost:7263/",
+                    ValidAudience = "https://localhost:7263/",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:Key3"])),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true
                 };
             });
 
+            // Configuração de políticas de autorização
+            builder.Services.AddAuthorization(options =>
+            {
+                // User Auth
+                options.AddPolicy("Policy1", policy =>
+                    policy.RequireAuthenticatedUser().AddAuthenticationSchemes("Jwt1").RequireClaim("scope", "scope1"));
+                // userAdmin Auth
+                options.AddPolicy("Policy2", policy =>
+                    policy.RequireAuthenticatedUser().AddAuthenticationSchemes("Jwt2").RequireClaim("scope", "scope2"));
+                // SystemLocation Auth
+                options.AddPolicy("Policy3", policy =>
+                   policy.RequireAuthenticatedUser().AddAuthenticationSchemes("Jwt3").RequireClaim("scope", "scope3"));
+
+                // Combined Policy
+                options.AddPolicy("Policy1OrPolicy2", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c => (c.Type == "scope" && c.Value == "scope1") ||
+                                                   (c.Type == "scope" && c.Value == "scope2")))
+                        .AddAuthenticationSchemes("Jwt1", "Jwt2"));
+            });
+
             // Add services to the container.
             builder.Services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DBConnection")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DBConnection")));
 
             builder.Services.AddCors(options =>
             {
@@ -71,10 +113,8 @@ namespace HefestusApi
                 });
             });
 
-            //builder.Services.AddControllers().AddJsonOptions(options =>
-            //{
-            //    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-            //});
+            builder.Services.AddScoped<IUserAdminRepository, UserAdminRepository>();
+            builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 
             builder.Services.AddScoped<ISystemLocationRepository, SystemLocationRepository>();
             builder.Services.AddScoped<ISystemLocationService, SystemLocationService>();
@@ -113,6 +153,7 @@ namespace HefestusApi
             builder.Services.AddScoped<IPersonService, PersonService>();
 
             builder.Services.AddScoped<TokenService>();
+            builder.Services.AddScoped<UserAdminTokenService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -126,18 +167,21 @@ namespace HefestusApi
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-           
             app.UseSwagger();
             app.UseSwaggerUI();
-            
 
             app.UseHttpsRedirection();
             app.UseCors("MyCorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                context.Database.Migrate();
+            }
 
             app.Run();
         }

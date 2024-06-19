@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HefestusApi.Controllers.PESSOAL
 {
-    //[Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class personGroupController : ControllerBase
@@ -19,10 +19,10 @@ namespace HefestusApi.Controllers.PESSOAL
             _personGroupService = personGroupService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAllPersonGroups()
+        [HttpGet("{SystemLocationId}")]
+        public async Task<ActionResult> GetAllPersonGroups(string SystemLocationId)
         {
-            var serviceResponse = await _personGroupService.GetAllPersonGroupsAsync();
+            var serviceResponse = await _personGroupService.GetAllPersonGroupsAsync( SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return StatusCode(500, serviceResponse.Message);
@@ -31,10 +31,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("{detailLevel}/{locationId}/{id}")]
-        public async Task<ActionResult> GetPersonGroupById(int id)
+        [HttpGet("{SystemLocationId}/{detailLevel}/{id}")]
+        public async Task<ActionResult> GetPersonGroupById(string SystemLocationId, int id)
         {
-            var serviceResponse = await _personGroupService.GetPersonGroupByIdAsync(id);
+            var serviceResponse = await _personGroupService.GetPersonGroupByIdAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return NotFound(serviceResponse.Message);
@@ -43,10 +43,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpGet("search/{detailLevel}/{searchTerm}")]
-        public async Task<ActionResult> SearchPersonGroupByName(string searchTerm, string detailLevel)
+        [HttpGet("search/{SystemLocationId}/{detailLevel}/{searchTerm}")]
+        public async Task<ActionResult> SearchPersonGroupByName(string searchTerm, string detailLevel, string SystemLocationId)
         {
-            var serviceResponse = await _personGroupService.SearchPersonGroupByNameAsync(searchTerm, detailLevel);
+            var serviceResponse = await _personGroupService.SearchPersonGroupByNameAsync(searchTerm, detailLevel,SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -55,22 +55,22 @@ namespace HefestusApi.Controllers.PESSOAL
             return Ok(serviceResponse.Data);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreatePersonGroup([FromBody] PersonGroupRequestDataDto request)
+        [HttpPost("{SystemLocationId}")]
+        public async Task<ActionResult> CreatePersonGroup([FromBody] PersonGroupRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _personGroupService.CreatePersonGroupAsync(request);
+            var serviceResponse = await _personGroupService.CreatePersonGroupAsync(request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
             }
 
-            return CreatedAtAction(nameof(GetPersonGroupById), new { id = serviceResponse.Data.Id }, serviceResponse.Data);
+            return Ok(serviceResponse.Data);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePersonGroup(int id, [FromBody] PersonGroupRequestDataDto request)
+        [HttpPut("{SystemLocationId}/{id}")]
+        public async Task<ActionResult> UpdatePersonGroup(int id, [FromBody] PersonGroupRequestDataDto request, string SystemLocationId)
         {
-            var serviceResponse = await _personGroupService.UpdatePersonGroupAsync(id, request);
+            var serviceResponse = await _personGroupService.UpdatePersonGroupAsync(id, request, SystemLocationId);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);
@@ -79,10 +79,10 @@ namespace HefestusApi.Controllers.PESSOAL
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePersonGroup(int id)
+        [HttpDelete("{SystemLocationId}/{id}")]
+        public async Task<ActionResult> DeletePersonGroup(string SystemLocationId, int id)
         {
-            var serviceResponse = await _personGroupService.DeletePersonGroupAsync(id);
+            var serviceResponse = await _personGroupService.DeletePersonGroupAsync(SystemLocationId, id);
             if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse.Message);

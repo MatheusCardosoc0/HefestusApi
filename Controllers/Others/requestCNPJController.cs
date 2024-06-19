@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace HefestusApi.Controllers.Others
 {
-    [Authorize]
+    [Authorize(Policy = "Policy1")]
     [Route("api/[controller]")]
     [ApiController]
     public class requestCNPJController : ControllerBase

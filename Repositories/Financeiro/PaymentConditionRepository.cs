@@ -16,23 +16,23 @@ namespace HefestusApi.Repositories.Financeiro
             _context = context;
         }
 
-        public async Task<IEnumerable<PaymentCondition>> GetAllPaymentConditionsAsync()
+        public async Task<IEnumerable<PaymentCondition>> GetAllPaymentConditionsAsync(string SystemLocationId)
         {
             return await _context.PaymentCondition
-                .ToListAsync();
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
-        public async Task<PaymentCondition?> GetPaymentConditionByIdAsync(int id)
+        public async Task<PaymentCondition?> GetPaymentConditionByIdAsync(string SystemLocationId, int id)
         {
             return await _context.PaymentCondition
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<PaymentCondition>> SearchPaymentConditionByNameAsync(string searchTerm)
+        public async Task<IEnumerable<PaymentCondition>> SearchPaymentConditionByNameAsync(string searchTerm, string SystemLocationId)
         {
             return await _context.PaymentCondition
-                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
-                .ToListAsync();
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") && p.SystemLocationId == SystemLocationId)
+                .Where(p => p.SystemLocationId == SystemLocationId).ToListAsync();
         }
 
         public async Task<bool> AddPaymentConditionAsync(PaymentCondition paymentCondition)

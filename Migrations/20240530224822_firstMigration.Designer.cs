@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HefestusApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240414233448_stock")]
-    partial class stock
+    [Migration("20240530224822_firstMigration")]
+    partial class firstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace HefestusApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("HefestusApi.Models.Administracao.SystemLocation", b =>
+            modelBuilder.Entity("HefestusApi.Models.Administracao.SubLocation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,11 +33,47 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SystemLocationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemLocationId");
+
+                    b.ToTable("SubLocation");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Administracao.SystemLocation", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -46,11 +82,14 @@ namespace HefestusApi.Migrations
 
             modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -63,8 +102,9 @@ namespace HefestusApi.Migrations
                     b.Property<int?>("PersonId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SystemLocationId")
-                        .HasColumnType("integer");
+                    b.Property<string>("SystemLocationId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -84,13 +124,23 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Installments")
                         .HasColumnType("integer");
 
                     b.Property<int>("Interval")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -110,7 +160,17 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -133,22 +193,24 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("IBGENumber")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LastModifiedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -186,9 +248,8 @@ namespace HefestusApi.Migrations
                     b.Property<int>("CityId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -214,8 +275,10 @@ namespace HefestusApi.Migrations
                     b.Property<bool?>("IsBlocked")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("LastModifiedAt")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LinkedSystemLocationId")
                         .HasColumnType("text");
 
                     b.Property<string>("MaritalStatus")
@@ -235,23 +298,29 @@ namespace HefestusApi.Migrations
                     b.Property<string>("Razao")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SystemLocationId")
+                    b.Property<int>("SubLocationId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SystemLocationId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("UrlImage")
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
+                    b.HasIndex("LinkedSystemLocationId");
+
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_Persons_Name");
 
-                    b.HasIndex("SystemLocationId")
+                    b.HasIndex("SubLocationId")
                         .IsUnique();
 
                     b.HasIndex("UserId")
@@ -268,15 +337,17 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -299,6 +370,9 @@ namespace HefestusApi.Migrations
                     b.Property<string>("Batch")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -315,6 +389,9 @@ namespace HefestusApi.Migrations
 
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("NCM")
                         .HasColumnType("integer");
@@ -338,6 +415,10 @@ namespace HefestusApi.Migrations
 
                     b.Property<int>("SubgroupId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SystemLocationId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("UnitOfMensuration")
                         .IsRequired()
@@ -374,7 +455,17 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -394,7 +485,17 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -414,7 +515,17 @@ namespace HefestusApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemLocationId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -440,8 +551,14 @@ namespace HefestusApi.Migrations
                     b.Property<decimal>("BruteCost")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<float>("CurrentStock")
                         .HasColumnType("real");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("LastStockUpdate")
                         .HasColumnType("timestamp with time zone");
@@ -450,6 +567,7 @@ namespace HefestusApi.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<float>("MaxStock")
@@ -473,7 +591,7 @@ namespace HefestusApi.Migrations
                     b.Property<decimal>("PromotionalPrice")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("SystemLocationId")
+                    b.Property<int>("SubLocationId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("UnitCost")
@@ -486,7 +604,7 @@ namespace HefestusApi.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("SystemLocationId");
+                    b.HasIndex("SubLocationId");
 
                     b.ToTable("Stock");
                 });
@@ -509,9 +627,8 @@ namespace HefestusApi.Migrations
                         .IsRequired()
                         .HasColumnType("real");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DateOfCompletion")
                         .IsRequired()
@@ -523,9 +640,8 @@ namespace HefestusApi.Migrations
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LastModifiedAt")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("LiquidValue")
                         .HasColumnType("numeric");
@@ -538,6 +654,10 @@ namespace HefestusApi.Migrations
 
                     b.Property<int>("ResponsibleId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SystemLocationId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("numeric");
@@ -635,13 +755,24 @@ namespace HefestusApi.Migrations
                     b.ToTable("PersonPersonGroup");
                 });
 
+            modelBuilder.Entity("HefestusApi.Models.Administracao.SubLocation", b =>
+                {
+                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", "SystemLocation")
+                        .WithMany("SubLocation")
+                        .HasForeignKey("SystemLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SystemLocation");
+                });
+
             modelBuilder.Entity("HefestusApi.Models.Administracao.User", b =>
                 {
-                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", "DefaultLocation")
+                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", null)
                         .WithMany("Users")
-                        .HasForeignKey("SystemLocationId");
-
-                    b.Navigation("DefaultLocation");
+                        .HasForeignKey("SystemLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Pessoal.Person", b =>
@@ -652,9 +783,15 @@ namespace HefestusApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", "SystemLocation")
+                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", "LinkedSystemLocation")
+                        .WithMany()
+                        .HasForeignKey("LinkedSystemLocationId");
+
+                    b.HasOne("HefestusApi.Models.Administracao.SubLocation", "SubLocation")
                         .WithOne("Person")
-                        .HasForeignKey("HefestusApi.Models.Pessoal.Person", "SystemLocationId");
+                        .HasForeignKey("HefestusApi.Models.Pessoal.Person", "SubLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HefestusApi.Models.Administracao.User", "User")
                         .WithOne("Person")
@@ -662,7 +799,9 @@ namespace HefestusApi.Migrations
 
                     b.Navigation("City");
 
-                    b.Navigation("SystemLocation");
+                    b.Navigation("LinkedSystemLocation");
+
+                    b.Navigation("SubLocation");
 
                     b.Navigation("User");
                 });
@@ -714,15 +853,15 @@ namespace HefestusApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HefestusApi.Models.Administracao.SystemLocation", "SystemLocation")
+                    b.HasOne("HefestusApi.Models.Administracao.SubLocation", "SubLocation")
                         .WithMany("Stocks")
-                        .HasForeignKey("SystemLocationId")
+                        .HasForeignKey("SubLocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("SystemLocation");
+                    b.Navigation("SubLocation");
                 });
 
             modelBuilder.Entity("HefestusApi.Models.Vendas.Order", b =>
@@ -813,12 +952,17 @@ namespace HefestusApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("HefestusApi.Models.Administracao.SystemLocation", b =>
+            modelBuilder.Entity("HefestusApi.Models.Administracao.SubLocation", b =>
                 {
                     b.Navigation("Person")
                         .IsRequired();
 
                     b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("HefestusApi.Models.Administracao.SystemLocation", b =>
+                {
+                    b.Navigation("SubLocation");
 
                     b.Navigation("Users");
                 });

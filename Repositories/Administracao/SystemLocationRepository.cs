@@ -17,35 +17,40 @@ namespace HefestusApi.Repositories.Administracao
 
         public async Task<IEnumerable<SystemLocation>> GetAllSystemLocationsAsync()
         {
-            return await _context.SystemLocation
-                .Include(x => x.Person)
-                .ToListAsync();
+            return await _context.SystemLocation.ToListAsync();
         }
 
-        public async Task<SystemLocation?> GetSystemLocationByIdAsync(int id)
+        public async Task<SystemLocation?> GetSystemLocationByIdAsync(string SystemLocationId)
         {
             return await _context.SystemLocation
-                .Include(c => c.Person)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == SystemLocationId);
         }
 
         public async Task<SystemLocation?> GetSystemLocationByNameAsync(string name)
         {
             return await _context.SystemLocation
-                .Include(c => c.Person)
-                .FirstOrDefaultAsync(c => c.Person.Name == name);
+                .FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public async Task<IEnumerable<SystemLocation>> SearchSystemLocationByNameAsync(string searchTerm)
         {
             return await _context.SystemLocation
-                .Where(p => EF.Functions.Like(p.Person.Name.ToLower(), $"%{searchTerm}%"))
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%"))
                 .ToListAsync();
         }
 
-        public async Task<bool> AddSystemLocationAsync(SystemLocation systemLocation)
+        public async Task<SystemLocation> SearchSystemLocationByNameCompareAsync(string searchTerm)
         {
-            _context.SystemLocation.Add(systemLocation);
+            return await _context.SystemLocation.FirstOrDefaultAsync(p => p.Name == searchTerm);
+        }
+
+        public async Task<bool> AddSystemLocationAsync(SystemLocation systemLocation, Person personAdmin, User userAdmin, PersonGroup personGroup, City city)
+        {
+            await _context.SystemLocation.AddAsync(systemLocation);
+            await _context.PersonGroup.AddAsync(personGroup);
+            await _context.Cities.AddAsync(city);
+            await _context.Person.AddAsync(personAdmin);
+            await _context.Users.AddAsync(userAdmin);
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -59,11 +64,6 @@ namespace HefestusApi.Repositories.Administracao
         {
             _context.SystemLocation.Remove(systemLocation);
             return await _context.SaveChangesAsync() > 0;
-        }
-
-        public async Task<Person?> GetPersonAsync(int id)
-        {
-            return await _context.Person.Include(p => p.SystemLocation).FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<bool> SaveCahngesAsymc()

@@ -11,7 +11,7 @@ public class MaxDecimalPlacesAttribute : ValidationAttribute
         ErrorMessage = ErrorMessage ?? $"O número não pode ter mais de {_maxDecimalPlaces} casas decimais.";
     }
 
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {
         if (value == null)
         {

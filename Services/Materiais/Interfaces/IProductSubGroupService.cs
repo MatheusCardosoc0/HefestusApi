@@ -6,11 +6,11 @@ namespace HefestusApi.Services.Materiais.Interfaces
 {
     public interface IProductSubGroupService
     {
-        Task<ServiceResponse<IEnumerable<ProductSubGroupDto>>> GetAllProductSubGroupsAsync();
-        Task<ServiceResponse<ProductSubGroup>> GetProductSubGroupByIdAsync(int id);
-        Task<ServiceResponse<IEnumerable<object>>> SearchProductSubGroupByNameAsync(string searchTerm, string detailLevel);
-        Task<ServiceResponse<ProductSubGroup>> CreateProductSubGroupAsync(ProductSubGroupRequestDataDto request);
-        Task<ServiceResponse<bool>> UpdateProductSubGroupAsync(int id, ProductSubGroupRequestDataDto request);
-        Task<ServiceResponse<bool>> DeleteProductSubGroupAsync(int id);
+        Task<ServiceResponse<IEnumerable<ProductSubGroupDto>>> GetAllProductSubGroupsAsync(string SystemLocationId);
+        Task<ServiceResponse<ProductSubGroup>> GetProductSubGroupByIdAsync(string SystemLocationId, int id);
+        Task<ServiceResponse<IEnumerable<object>>> SearchProductSubGroupByNameAsync(string searchTerm, string detailLevel, string SystemLocationId);
+        Task<ServiceResponse<ProductSubGroup>> CreateProductSubGroupAsync(ProductSubGroupRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> UpdateProductSubGroupAsync(int id, ProductSubGroupRequestDataDto request, string SystemLocationId);
+        Task<ServiceResponse<bool>> DeleteProductSubGroupAsync(string SystemLocationId, int id);
     }
 }

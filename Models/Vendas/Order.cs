@@ -18,6 +18,8 @@ namespace HefestusApi.Models.Vendas
         [Key]
         public int Id { get; set; }
 
+        public string SystemLocationId { get; set; }
+
         [Required]
         public int ClientId { get; set; }
 
@@ -79,6 +81,12 @@ namespace HefestusApi.Models.Vendas
         public float? CostOfFreight { get; set; }
 
         public int TypeFreight { get; set; }
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; private set; } = DateTime.UtcNow;
+
+        // Métodos para atualizar datas
+        public void UpdateLastModified() => LastModifiedAt = DateTime.UtcNow;
     }
 
     /// <summary>
