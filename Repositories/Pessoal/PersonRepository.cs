@@ -55,7 +55,7 @@ namespace HefestusApi.Repositories.Pessoal
 
         public async Task<PersonGroup?> FindPersonGroupByIdAsync(string SystemLocationId, int id)
         {
-            return await _context.PersonGroup.FindAsync(SystemLocationId, id);
+            return await _context.PersonGroup.FirstOrDefaultAsync(pg => pg.Id == id && pg.SystemLocationId == SystemLocationId);
         }
 
         public async Task<City?> FindCityByIdAsync(string SystemLocationId, int id)
